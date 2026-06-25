@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Traffy Fondue: City Transformers Awards</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nstda: { navy: '#002244', silver: '#C0C0C0' },
+                        traffy: { orange: '#FF6B00' },
+                    },
+                    fontFamily: {
+                        prompt: ['Prompt', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
+        .font-en { font-family: 'Montserrat', sans-serif; }
+        canvas { touch-action: none; /* Prevent scrolling when panning */ }
+        .btn-award.active { transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); outline: 3px solid #002244; }
+        input[type=range] { accent-color: #FF6B00; }
+    </style>
+</head>
+<body class="text-slate-800 pb-20">
+
+    <header class="bg-nstda-navy text-white shadow-md rounded-b-3xl mb-6 py-5 px-4 relative overflow-hidden">
+        <div class="absolute opacity-10 right-0 top-0 w-32 h-32 bg-white rounded-full -mr-10 -mt-10"></div>
+        <div class="max-w-md mx-auto text-center relative z-10">
+            <h1 class="text-xl font-bold font-en tracking-tight">Traffy Fondue</h1>
+            <h2 class="text-sm font-light text-nstda-silver mt-1">City Transformers Awards 2026</h2>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-4">
+        
+        <div class="flex justify-center mb-6">
+            <label class="bg-traffy-orange hover:bg-orange-600 text-white px-6 py-3 rounded-full font-medium shadow-lg flex items-center gap-2 cursor-pointer transition-colors w-full justify-center">
+                <i class="fas fa-camera"></i> ถ่ายภาพ / อัปโหลด
+                <input type="file" id="imageUpload" accept="image/*" capture="environment" class="hidden">
+            </label>
+        </div>
+
+        <div class="relative bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-4">
+            <canvas id="boothCanvas" width="1080" height="1080" class="w-full h-auto block bg-slate-100"></canvas>
+            <div id="placeholderText" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+                <i class="far fa-image text-4xl mb-2"></i>
+                <p class="text-sm">อัปโหลดรูปภาพเพื่อเริ่มต้น</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-8">
+            <div class="flex items-center gap-3 text-slate-500">
+                <i class="fas fa-search-minus text-sm"></i>
+                <input type="range" id="zoomSlider" min="0.5" max="3" step="0.01" value="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                <i class="fas fa-search-plus text-sm"></i>
+            </div>
+            <p class="text-xs text-center text-slate-400 mt-2">ใช้นิ้วเลื่อนรูปภาพบนกรอบเพื่อจัดตำแหน่ง</p>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="text-center font-bold text-nstda-navy mb-4 relative">
+                <span class="bg-[#f8fafc] px-4 relative z-10">เลือกกรอบภาพรางวัล</span>
+                <div class="absolute w-full h-px bg-slate-300 top-1/2 left-0 -z-0"></div>
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-3" id="awardButtons">
+                </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-8 border-t border-slate-200 pt-6">
+            <button id="btnDownload" class="bg-nstda-navy text-white py-3 rounded-xl font-medium shadow-md flex justify-center items-center gap-2 hover:bg-blue-900 transition">
+                <i class="fas fa-download"></i> บันทึกรูปภาพ
+            </button>
+            <button id="btnShare" class="bg-blue-600 text-white py-3 rounded-xl font-medium shadow-md flex justify-center items-center gap-2 hover:bg-blue-700 transition">
+                <i class="fas fa-share-nodes"></i> แชร์โซเชียล
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        const awards = [
+            { id: 0, name: "ผู้ร่วมขับเคลื่อนเมือง", color: "#C0C0C0", icon: "\uf007", quote: "We build a city for a better life" },
+            { id: 1, name: "22 จังหวัดใหม่", color: "#3B82F6", icon: "\uf279", quote: "New Power, Better Solutions" },
+            { id: 2, name: "รับแจ้งเกิน 100,000 เคส", color: "#FFD700", icon: "\uf091", quote: "Milestone of Trust and Dedication" },
+            { id: 3, name: "เป็นเลิศรอบด้าน", color: "#F59E0B", icon: "\uf521", quote: "You're the Best! The Ultimate Performer" },
+            { id: 4, name: "บริการตรงใจ", color: "#EC4899", icon: "\uf4fc", quote: "Service with Heart, Solutions with Tech" },
+            { id: 5, name: "แก้ไขฉับไว", color: "#EF4444", icon: "\uf0e7", quote: "Speed and Efficiency for Better Living" },
+            { id: 6, name: "ใส่ใจพัฒนา", color: "#22C55E", icon: "\uf201", quote: "Never Stop Improving Our City" }
+        ];
+
+        let currentAwardIndex = 0;
+        let userImage = null;
+        let imgScale = 1;
+        let imgOffsetX = 0;
+        let imgOffsetY = 0;
+        let isDragging = false;
+        let dragStartX, dragStartY;
+
+        const canvas = document.getElementById('boothCanvas');
+        const ctx = canvas.getContext('2d');
+        const uploadInput = document.getElementById('imageUpload');
+        const zoomSlider = document.getElementById('zoomSlider');
+        const placeholderText = document.getElementById('placeholderText');
+        const btnDownload = document.getElementById('btnDownload');
+        const btnShare = document.getElementById('btnShare');
+
+        // Initialize UI
+        function init() {
+            renderAwardButtons();
+            // Wait for FontAwesome to load before initial draw
+            document.fonts.ready.then(() => drawCanvas());
+            setupEventListeners();
+        }
+
+        function renderAwardButtons() {
+            const container = document.getElementById('awardButtons');
+            awards.forEach((award, index) => {
+                const btn = document.createElement('button');
+                // Make the first button span full width if odd number of items, to keep grid balanced
+                const colSpanClass = (index === awards.length - 1 && awards.length % 2 !== 0) ? 'col-span-2' : 'col-span-1';
+                
+                btn.className = `btn-award ${colSpanClass} p-3 rounded-xl flex flex-col items-center justify-center gap-2 border-2 transition-all bg-white text-slate-700`;
+                btn.style.borderColor = index === currentAwardIndex ? '#002244' : '#e2e8f0';
+                if(index === currentAwardIndex) btn.classList.add('active');
+                
+                btn.innerHTML = `
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg shadow-sm" style="background-color: ${award.color};">
+                        <i class="fa-solid fa-${getIconClass(award.icon)}"></i>
+                    </div>
+                    <span class="text-xs font-medium text-center">${award.name}</span>
+                `;
+                
+                btn.onclick = () => {
+                    currentAwardIndex = index;
+                    document.querySelectorAll('.btn-award').forEach(b => {
+                        b.classList.remove('active');
+                        b.style.borderColor = '#e2e8f0';
+                    });
+                    btn.classList.add('active');
+                    btn.style.borderColor = '#002244';
+                    drawCanvas();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Map unicode back to FA class for standard UI
+        function getIconClass(unicode) {
+            const map = { "\uf007":"user", "\uf279":"map", "\uf091":"trophy", "\uf521":"crown", "\uf4fc":"hand-holding-heart", "\uf0e7":"bolt", "\uf201":"chart-line" };
+            return map[unicode] || "star";
+        }
+
+        // Image Upload
+        uploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    userImage = img;
+                    placeholderText.style.display = 'none';
+                    // Reset transform
+                    imgOffsetX = 0;
+                    imgOffsetY = 0;
+                    zoomSlider.value = 1;
+                    imgScale = 1;
+                    
+                    // Calculate initial scale to cover canvas
+                    const scaleX = canvas.width / img.width;
+                    const scaleY = canvas.height / img.height;
+                    const baseScale = Math.max(scaleX, scaleY);
+                    img.baseScale = baseScale;
+                    
+                    drawCanvas();
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // Zoom Control
+        zoomSlider.addEventListener('input', function(e) {
+            imgScale = parseFloat(e.target.value);
+            drawCanvas();
+        });
+
+        // Setup Pan (Drag) Events
+        function setupEventListeners() {
+            // Mouse Events
+            canvas.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', drag);
+            window.addEventListener('mouseup', endDrag);
+            
+            // Touch Events
+            canvas.addEventListener('touchstart', (e) => {
+                if(e.touches.length === 1) startDrag(e.touches[0]);
+            }, {passive: false});
+            canvas.addEventListener('touchmove', (e) => {
+                if(e.touches.length === 1) {
+                    e.preventDefault(); // Prevent scroll
+                    drag(e.touches[0]);
+                }
+            }, {passive: false});
+            canvas.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            if (!userImage) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            isDragging = true;
+            dragStartX = e.clientX * scaleX - imgOffsetX;
+            dragStartY = e.clientY * scaleY - imgOffsetY;
+        }
+
+        function drag(e) {
+            if (!isDragging || !userImage) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            imgOffsetX = e.clientX * scaleX - dragStartX;
+            imgOffsetY = e.clientY * scaleY - dragStartY;
+            drawCanvas();
+        }
+
+        function endDrag() { isDragging = false; }
+
+        // Main Draw Function
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const award = awards[currentAwardIndex];
+
+            // 1. Draw User Image
+            if (userImage) {
+                ctx.save();
+                // Move to center, apply offset and scale
+                ctx.translate(canvas.width/2 + imgOffsetX, canvas.height/2 + imgOffsetY);
+                const finalScale = userImage.baseScale * imgScale;
+                ctx.scale(finalScale, finalScale);
+                ctx.drawImage(userImage, -userImage.width/2, -userImage.height/2);
+                ctx.restore();
+            }
+
+            // 2. Draw Background Graphic Overlay (Tech lines / Cityscape concept)
+            drawTechBackgroundOverlay();
+
+            // 3. Draw Dynamic Frame Border
+            ctx.lineWidth = 40;
+            ctx.strokeStyle = award.color;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+            // 4. Draw Logos (Top Left: อว. & NSTDA, Top Right: Traffy)
+            drawMockLogos();
+
+            // 5. Draw Bottom Section Gradient for readability
+            const grad = ctx.createLinearGradient(0, canvas.height - 400, 0, canvas.height);
+            grad.addColorStop(0, 'rgba(0,34,68,0)');
+            grad.addColorStop(0.5, 'rgba(0,34,68,0.7)');
+            grad.addColorStop(1, 'rgba(0,34,68,0.95)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, canvas.height - 400, canvas.width, 400);
+
+            // 6. Draw Quote
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.font = "italic 500 28px 'Montserrat'";
+            ctx.textAlign = "center";
+            ctx.fillText(`"${award.quote}"`, canvas.width/2, canvas.height - 230);
+
+            // 7. Draw Event Name
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font = "800 36px 'Montserrat'";
+            ctx.fillText("TRAFFY FONDUE AWARD 2026", canvas.width/2, canvas.height - 180);
+
+            // 8. Draw Ribbon (Award Name & Icon)
+            drawRibbon(award);
+        }
+
+        function drawTechBackgroundOverlay() {
+            ctx.save();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            // Draw some geometric lines indicating "Tech" and "City"
+            for(let i = 0; i < canvas.width; i += 100) {
+                ctx.moveTo(i, 0); ctx.lineTo(i + 300, canvas.height);
+            }
+            ctx.stroke();
+            
+            // Subtle cityscape at bottom
+            ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+            const heights = [100, 150, 80, 200, 120, 180, 90, 160];
+            const w = canvas.width / heights.length;
+            heights.forEach((h, i) => {
+                ctx.fillRect(i * w, canvas.height - h - 100, w, h);
+            });
+            ctx.restore();
+        }
+
+        function drawMockLogos() {
+            // Draw placeholder graphics representing official logos for standalone reliability
+            ctx.save();
+            // Top Left (อว. / สวทช. Concept)
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.beginPath(); ctx.roundRect(40, 40, 180, 60, 10); ctx.fill();
+            ctx.fillStyle = "#002244";
+            ctx.font = "700 22px 'Prompt'";
+            ctx.textAlign = "left";
+            ctx.fillText("อว. | สวทช.", 65, 78);
+
+            // Top Right (Traffy Fondue Concept)
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.beginPath(); ctx.roundRect(canvas.width - 260, 40, 220, 60, 10); ctx.fill();
+            
+            // Megaphone icon + text
+            ctx.fillStyle = "#FF6B00";
+            ctx.font = '900 24px "Font Awesome 6 Free"';
+            ctx.fillText("\uf0a1", canvas.width - 240, 78); // megaphone
+            
+            ctx.fillStyle = "#002244";
+            ctx.font = "800 24px 'Montserrat'";
+            ctx.fillText("Traffy*", canvas.width - 200, 79);
+            ctx.restore();
+        }
+
+        function drawRibbon(award) {
+            ctx.save();
+            
+            // Text measurement to dynamic size the ribbon
+            ctx.font = "700 48px 'Prompt'";
+            const textWidth = ctx.measureText(award.name).width;
+            const iconSpacing = 60;
+            const padding = 100;
+            const ribbonWidth = textWidth + iconSpacing + padding;
+            const ribbonHeight = 90;
+            const rX = (canvas.width - ribbonWidth) / 2;
+            const rY = canvas.height - 140;
+
+            // Ribbon Background
+            ctx.fillStyle = award.color;
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetY = 5;
+            ctx.beginPath();
+            ctx.roundRect(rX, rY, ribbonWidth, ribbonHeight, 45);
+            ctx.fill();
+            ctx.shadowColor = "transparent";
+
+            // Determine text color based on background luminance
+            const hex = award.color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            const textColor = (yiq >= 128) ? '#002244' : '#FFFFFF';
+
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            
+            // Draw Icon
+            ctx.font = '900 40px "Font Awesome 6 Free"';
+            const startX = rX + (padding/2);
+            ctx.fillText(award.icon, startX, rY + ribbonHeight/2);
+            
+            // Draw Text
+            ctx.font = "700 44px 'Prompt'";
+            ctx.fillText(award.name, startX + iconSpacing, rY + ribbonHeight/2 + 2); // +2 for visual optical alignment
+            
+            ctx.restore();
+        }
+
+        // Download Image
+        btnDownload.addEventListener('click', () => {
+            if(!userImage) return alert("กรุณาอัปโหลดรูปภาพก่อนบันทึก");
+            const link = document.createElement('a');
+            link.download = `Traffy-Award-${awards[currentAwardIndex].name}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Share API
+        btnShare.addEventListener('click', async () => {
+            if(!userImage) return alert("กรุณาอัปโหลดรูปภาพก่อนแชร์");
+            
+            const dataUrl = canvas.toDataURL('image/png');
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], 'traffy-award.png', { type: 'image/png' });
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Traffy Fondue City Transformers Awards',
+                        text: `ฉันได้รับกรอบภาพรางวัล: ${awards[currentAwardIndex].name} มาร่วมสร้างเมืองที่ดีกว่าด้วยกัน!`,
+                        files: [file]
+                    });
+                } catch (error) {
+                    console.log('Error sharing:', error);
+                }
+            } else {
+                alert("เบราว์เซอร์ของคุณไม่รองรับระบบแชร์โดยตรง กรุณากด 'บันทึกรูปภาพ' และแชร์ด้วยตนเอง");
+            }
+        });
+
+        // Init App
+        window.onload = init;
+    </script>
+</body>
+</html>
