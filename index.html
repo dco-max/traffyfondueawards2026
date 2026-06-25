@@ -1,0 +1,1087 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Traffy Fondue – City Transformers Awards 📸</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700;800&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            montserrat: ['Montserrat', 'sans-serif'],
+          },
+          colors: {
+            navy:   { DEFAULT: '#0B1F4B', dark: '#071435', light: '#1A3A7A' },
+            silver: { DEFAULT: '#B8C4D4', light: '#E8EEF4', dark: '#8899AA' },
+            traffy: { DEFAULT: '#FF6B2B', dark: '#E05520', light: '#FF8C55' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Prompt', sans-serif; background: #071435; min-height: 100dvh; overscroll-behavior: none; }
+
+    /* ── Particle Canvas ── */
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #0B1F4B; }
+    ::-webkit-scrollbar-thumb { background: #FF6B2B; border-radius: 4px; }
+
+    /* ── Upload zone ── */
+    #drop-zone {
+      border: 2px dashed #1A3A7A;
+      transition: border-color .25s, background .25s;
+    }
+    #drop-zone.drag-over { border-color: #FF6B2B; background: rgba(255,107,43,.08); }
+
+    /* ── Frame selector ── */
+    .frame-btn {
+      transition: transform .18s, box-shadow .18s, border-color .18s;
+      border: 2px solid transparent;
+    }
+    .frame-btn:hover  { transform: translateY(-3px) scale(1.04); }
+    .frame-btn.active { border-color: #FF6B2B !important; box-shadow: 0 0 0 3px rgba(255,107,43,.35); transform: translateY(-3px) scale(1.05); }
+
+    /* ── Canvas wrapper ── */
+    #canvas-wrap { touch-action: none; cursor: grab; }
+    #canvas-wrap:active { cursor: grabbing; }
+
+    /* ── Glow pulse on preview ── */
+    @keyframes glow-pulse {
+      0%,100% { box-shadow: 0 0 18px 2px rgba(255,107,43,.25); }
+      50%      { box-shadow: 0 0 32px 6px rgba(255,107,43,.55); }
+    }
+    #preview-shell.glowing { animation: glow-pulse 2.4s ease-in-out infinite; }
+
+    /* ── Action buttons ── */
+    .btn-primary {
+      background: linear-gradient(135deg,#FF6B2B,#E05520);
+      transition: transform .15s, box-shadow .15s, filter .15s;
+    }
+    .btn-primary:hover  { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(255,107,43,.5); }
+    .btn-primary:active { transform: scale(.97); filter: brightness(.9); }
+    .btn-secondary {
+      background: linear-gradient(135deg,#1A3A7A,#0B1F4B);
+      border: 1px solid #2A4F9A;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-secondary:hover  { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(26,58,122,.6); }
+    .btn-secondary:active { transform: scale(.97); }
+
+    /* ── Zoom controls ── */
+    #zoom-controls button { transition: background .15s, transform .15s; }
+    #zoom-controls button:active { transform: scale(.92); }
+
+    /* ── Toast ── */
+    #toast { transition: opacity .3s, transform .3s; }
+    #toast.show { opacity: 1 !important; transform: translateY(0) !important; }
+
+    /* ── Loading overlay ── */
+    #loading { transition: opacity .25s; }
+
+    /* ── Section fade-in ── */
+    .section-card { background: rgba(11,31,75,.75); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.06); }
+  </style>
+</head>
+
+<body class="text-silver-light font-prompt relative overflow-x-hidden">
+
+<!-- ═══════════════════════ BG PARTICLE CANVAS ═══════════════════════ -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══════════════════════ LOADING OVERLAY ═══════════════════════════ -->
+<div id="loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-navy-dark opacity-100">
+  <div class="relative mb-6">
+    <!-- Megaphone SVG logo  -->
+    <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+      <circle cx="36" cy="36" r="36" fill="#0B1F4B"/>
+      <path d="M52 22 L28 30 L28 42 L52 50 Z" fill="#FF6B2B"/>
+      <rect x="20" y="30" width="10" height="12" rx="2" fill="#B8C4D4"/>
+      <line x1="24" y1="42" x2="22" y2="52" stroke="#B8C4D4" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="52" cy="36" rx="4" ry="9" fill="#FF8C55" opacity=".7"/>
+    </svg>
+    <div class="absolute -inset-2 rounded-full border-2 border-traffy opacity-60 animate-ping"></div>
+  </div>
+  <p class="font-montserrat font-bold text-lg text-traffy tracking-widest">TRAFFY FONDUE</p>
+  <p class="text-silver text-sm mt-1">City Transformers Awards</p>
+  <div class="mt-5 w-36 h-1 bg-navy-light rounded-full overflow-hidden">
+    <div id="load-bar" class="h-full bg-traffy rounded-full" style="width:0%;transition:width .05s linear"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN APP ════════════════════════════════== -->
+<div id="app" class="relative z-10 max-w-lg mx-auto px-4 pb-16 pt-4">
+
+  <!-- ─── HEADER ─── -->
+  <header class="text-center py-5 mb-2">
+    <!-- Logo row -->
+    <div class="flex items-center justify-center gap-3 mb-3">
+      <svg width="44" height="44" viewBox="0 0 72 72" fill="none" class="flex-shrink-0">
+        <circle cx="36" cy="36" r="36" fill="#0B1F4B"/>
+        <path d="M52 22 L28 30 L28 42 L52 50 Z" fill="#FF6B2B"/>
+        <rect x="20" y="30" width="10" height="12" rx="2" fill="#B8C4D4"/>
+        <line x1="24" y1="42" x2="22" y2="52" stroke="#B8C4D4" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="52" cy="36" rx="4" ry="9" fill="#FF8C55" opacity=".7"/>
+      </svg>
+      <div class="text-left">
+        <p class="font-montserrat font-black text-xl text-traffy leading-none">TRAFFY<span class="text-silver-light">*</span></p>
+        <p class="font-montserrat text-[10px] text-silver tracking-widest uppercase">Fondue Platform</p>
+      </div>
+      <div class="h-8 w-px bg-silver-dark mx-1 opacity-40"></div>
+      <!-- NSTDA badge -->
+      <div class="text-left">
+        <p class="font-montserrat font-bold text-[10px] text-silver tracking-widest">NSTDA</p>
+        <p class="font-montserrat text-[9px] text-silver-dark">สวทช.</p>
+      </div>
+    </div>
+    <h1 class="font-montserrat font-black text-2xl sm:text-3xl text-white leading-tight tracking-wide">
+      CITY TRANSFORMERS
+    </h1>
+    <h2 class="font-montserrat font-bold text-traffy text-lg sm:text-xl tracking-widest">AWARDS 2026</h2>
+    <p class="text-silver text-xs mt-1 font-prompt">📸 ถ่ายรูป · เลือกกรอบรางวัล · แชร์เลย!</p>
+  </header>
+
+  <!-- ─── STEP 1 : UPLOAD ─── -->
+  <section class="section-card rounded-2xl p-5 mb-4">
+    <h3 class="font-prompt font-semibold text-silver-light mb-3 flex items-center gap-2">
+      <span class="bg-traffy text-white text-xs font-montserrat font-bold px-2 py-0.5 rounded-full">1</span>
+      อัปโหลดหรือถ่ายภาพ
+    </h3>
+
+    <!-- Drop zone -->
+    <div id="drop-zone"
+         class="rounded-xl flex flex-col items-center justify-center gap-3 py-8 cursor-pointer bg-navy-dark/60 mb-3"
+         onclick="document.getElementById('file-input').click()">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="23" stroke="#1A3A7A" stroke-width="1.5"/>
+        <path d="M24 14v14M17 21l7-7 7 7" stroke="#FF6B2B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 34h20" stroke="#B8C4D4" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p class="text-silver text-sm text-center leading-relaxed">ลากรูปวางที่นี่<br/><span class="text-silver-dark text-xs">หรือกดปุ่มด้านล่าง</span></p>
+    </div>
+
+    <!-- Camera / Upload button -->
+    <button onclick="document.getElementById('file-input').click()"
+            class="btn-primary w-full rounded-xl py-3.5 font-prompt font-semibold text-white text-base flex items-center justify-center gap-2 shadow-lg">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      ถ่ายภาพ / อัปโหลด
+    </button>
+
+    <!-- Hidden inputs -->
+    <input id="file-input" type="file" accept="image/*" capture="environment" class="hidden" onchange="onFileSelected(event)" />
+  </section>
+
+  <!-- ─── STEP 2 : PREVIEW + PAN/ZOOM ─── -->
+  <section id="preview-section" class="section-card rounded-2xl p-5 mb-4 hidden">
+    <h3 class="font-prompt font-semibold text-silver-light mb-3 flex items-center gap-2">
+      <span class="bg-traffy text-white text-xs font-montserrat font-bold px-2 py-0.5 rounded-full">2</span>
+      ปรับตำแหน่งรูปภาพ
+    </h3>
+    <p class="text-silver-dark text-xs mb-3">ใช้นิ้วเลื่อน / Pinch Zoom เพื่อจัดรูปให้พอดีกรอบ</p>
+
+    <!-- Canvas preview -->
+    <div id="preview-shell" class="relative rounded-xl overflow-hidden glowing mx-auto"
+         style="max-width:360px; aspect-ratio:1/1;">
+      <div id="canvas-wrap" class="w-full h-full">
+        <canvas id="photo-canvas" class="block w-full h-full rounded-xl"></canvas>
+      </div>
+    </div>
+
+    <!-- Zoom controls -->
+    <div id="zoom-controls" class="flex items-center justify-center gap-3 mt-4">
+      <button onclick="adjustZoom(-0.1)"
+              class="bg-navy-light text-silver-light rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold hover:bg-navy-dark shadow">−</button>
+      <div class="flex-1 max-w-[140px]">
+        <input id="zoom-range" type="range" min="0.5" max="4" step="0.05" value="1"
+               oninput="setZoom(parseFloat(this.value))"
+               class="w-full accent-traffy cursor-pointer" />
+      </div>
+      <button onclick="adjustZoom(0.1)"
+              class="bg-navy-light text-silver-light rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold hover:bg-navy-dark shadow">+</button>
+      <button onclick="resetTransform()"
+              class="bg-navy-light text-silver text-xs rounded-lg px-3 h-10 hover:bg-navy-dark shadow">รีเซต</button>
+    </div>
+  </section>
+
+  <!-- ─── STEP 3 : CHOOSE FRAME ─── -->
+  <section id="frame-section" class="section-card rounded-2xl p-5 mb-4 hidden">
+    <h3 class="font-prompt font-semibold text-silver-light mb-1 flex items-center gap-2">
+      <span class="bg-traffy text-white text-xs font-montserrat font-bold px-2 py-0.5 rounded-full">3</span>
+      เลือกกรอบภาพรางวัล
+    </h3>
+    <p class="text-center text-silver-dark text-xs mb-4">แตะกรอบที่ต้องการ</p>
+
+    <!-- Frame grid -->
+    <div id="frame-grid" class="grid grid-cols-2 gap-3"></div>
+  </section>
+
+  <!-- ─── STEP 4 : SHARE ─── -->
+  <section id="share-section" class="section-card rounded-2xl p-5 mb-4 hidden">
+    <h3 class="font-prompt font-semibold text-silver-light mb-4 flex items-center gap-2">
+      <span class="bg-traffy text-white text-xs font-montserrat font-bold px-2 py-0.5 rounded-full">4</span>
+      บันทึกและแชร์
+    </h3>
+    <div class="flex flex-col gap-3">
+      <button id="btn-download" onclick="downloadPhoto()"
+              class="btn-primary w-full rounded-xl py-3.5 font-prompt font-semibold text-white flex items-center justify-center gap-2 shadow-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        บันทึกรูปลงเครื่อง
+      </button>
+      <button id="btn-share" onclick="sharePhoto()"
+              class="btn-secondary w-full rounded-xl py-3.5 font-prompt font-semibold text-silver-light flex items-center justify-center gap-2 shadow-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        แชร์โซเชียลมีเดีย
+      </button>
+    </div>
+    <p class="text-center text-silver-dark text-xs mt-3">#FondueAward2026 · #TraffyFondue · #CityTransformers</p>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="text-center text-silver-dark text-xs py-4">
+    <p class="font-montserrat">© 2026 <span class="text-traffy font-semibold">Traffy Fondue</span> · NSTDA</p>
+    <p class="mt-1">Powered by NSTDA Digital Platform</p>
+  </footer>
+</div><!-- /app -->
+
+<!-- ═══════════════════════ TOAST ════════════════════════════════════ -->
+<div id="toast"
+     class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-navy-light border border-traffy text-silver-light text-sm font-prompt
+            px-5 py-3 rounded-xl shadow-2xl z-50 opacity-0 translate-y-4 pointer-events-none whitespace-nowrap">
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────────────────────────────
+   0. LOADING BAR
+───────────────────────────────────────────────────────────────────── */
+(function(){
+  const bar = document.getElementById('load-bar');
+  let w = 0;
+  const iv = setInterval(()=>{ w = Math.min(w + Math.random()*18, 95); bar.style.width = w+'%'; }, 80);
+  window.addEventListener('load', ()=>{
+    clearInterval(iv);
+    bar.style.width = '100%';
+    setTimeout(()=>{
+      const el = document.getElementById('loading');
+      el.style.opacity = '0';
+      setTimeout(()=>{ el.style.display='none'; }, 300);
+    }, 350);
+  });
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   1. BG PARTICLE CANVAS
+───────────────────────────────────────────────────────────────────── */
+(function(){
+  const c = document.getElementById('bg-canvas');
+  const ctx = c.getContext('2d');
+  let W, H, pts=[], lines=[];
+
+  function resize(){
+    W = c.width  = window.innerWidth;
+    H = c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for(let i=0;i<55;i++) pts.push({
+    x: Math.random()*2000, y: Math.random()*3000,
+    vx:(Math.random()-.5)*.22, vy:(Math.random()-.5)*.22,
+    r: Math.random()*1.6+.4, a: Math.random()
+  });
+
+  // static city silhouette points
+  const city = [0,.9,.05,.9,.05,.6,.1,.6,.1,.5,.15,.5,.15,.7,.2,.7,.2,.4,.25,.4,.25,.75,.28,.75,.28,.35,.33,.35,.33,.8,.38,.8,.38,.45,.43,.45,.43,.75,.48,.75,.48,.3,.53,.3,.53,.78,.56,.78,.56,.4,.6,.4,.6,.72,.64,.72,.64,.42,.69,.42,.69,.8,.73,.8,.73,.5,.77,.5,.77,.6,.82,.6,.82,.38,.87,.38,.87,.65,.9,.65,.9,.55,.95,.55,.95,.9,1,.9,1,1,0,1];
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // gradient sky
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#030d20'); g.addColorStop(1,'#071435');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    // city silhouette
+    ctx.beginPath();
+    for(let i=0;i<city.length;i+=2){
+      const x=city[i]*W, y=city[i+1]*H;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle='rgba(7,20,53,.85)'; ctx.fill();
+
+    // tech grid lines (horizontal)
+    ctx.strokeStyle='rgba(26,58,122,.18)'; ctx.lineWidth=.6;
+    for(let y=0;y<H;y+=38){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    for(let x=0;x<W;x+=38){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+
+    // particles
+    pts.forEach(p=>{
+      p.x=(p.x+p.vx+W)%W; p.y=(p.y+p.vy+H)%H;
+      ctx.beginPath();
+      ctx.arc(p.x%W, p.y%H, p.r, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(184,196,212,${p.a*.6})`;
+      ctx.fill();
+    });
+
+    // connection lines
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<130){
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x%W,pts[i].y%H);
+          ctx.lineTo(pts[j].x%W,pts[j].y%H);
+          ctx.strokeStyle=`rgba(255,107,43,${.12*(1-d/130)})`;
+          ctx.lineWidth=.7; ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   2. DATA  – 7 awards
+───────────────────────────────────────────────────────────────────── */
+const AWARDS = [
+  {
+    id:0, key:'mover',
+    name:'ผู้ร่วมขับเคลื่อนเมือง', nameEn:'City Mover',
+    color:'#B8C4D4', colorDark:'#8899AA', colorLight:'#E8EEF4',
+    quote:'We build a city for a better life',
+    emoji:'👤',
+    drawIcon(ctx,cx,cy,r,col){
+      // person silhouette
+      ctx.fillStyle=col;
+      ctx.beginPath(); ctx.arc(cx,cy-r*.45,r*.3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx-r*.4,cy+r*.55); ctx.quadraticCurveTo(cx-r*.45,cy,cx,cy-.05*r);
+      ctx.quadraticCurveTo(cx+r*.45,cy,cx+r*.4,cy+r*.55); ctx.closePath(); ctx.fill();
+    }
+  },
+  {
+    id:1, key:'province',
+    name:'22 จังหวัดใหม่', nameEn:'22 New Provinces',
+    color:'#3B82F6', colorDark:'#1D4ED8', colorLight:'#BFDBFE',
+    quote:'New Power, Better Solutions',
+    emoji:'🗺️',
+    drawIcon(ctx,cx,cy,r,col){
+      // map pin
+      ctx.strokeStyle=col; ctx.lineWidth=r*.13; ctx.fillStyle=col;
+      ctx.beginPath(); ctx.arc(cx,cy-r*.1,r*.38,Math.PI,0); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx-r*.38,cy-r*.1);
+      ctx.quadraticCurveTo(cx-r*.38,cy+r*.35,cx,cy+r*.55);
+      ctx.quadraticCurveTo(cx+r*.38,cy+r*.35,cx+r*.38,cy-r*.1);
+      ctx.fillStyle=col; ctx.fill();
+      ctx.fillStyle='#0B1F4B';
+      ctx.beginPath(); ctx.arc(cx,cy-r*.1,r*.15,0,Math.PI*2); ctx.fill();
+    }
+  },
+  {
+    id:2, key:'hundred',
+    name:'รับแจ้งเกิน 100,000 เคส', nameEn:'100K+ Cases',
+    color:'#EAB308', colorDark:'#A16207', colorLight:'#FEF08A',
+    quote:'Milestone of Trust and Dedication',
+    emoji:'🏆',
+    drawIcon(ctx,cx,cy,r,col){
+      // trophy
+      const s=r*.88;
+      ctx.fillStyle=col;
+      // cup body
+      ctx.beginPath();
+      ctx.moveTo(cx-s*.42,cy-s*.4);
+      ctx.lineTo(cx-s*.42,cy+s*.05);
+      ctx.quadraticCurveTo(cx,cy+s*.55,cx+s*.42,cy+s*.05);
+      ctx.lineTo(cx+s*.42,cy-s*.4);
+      ctx.closePath(); ctx.fill();
+      // handles
+      ctx.strokeStyle=col; ctx.lineWidth=s*.1; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(cx-s*.42,cy-s*.2); ctx.quadraticCurveTo(cx-s*.68,cy-s*.2,cx-s*.68,cy+s*.05); ctx.quadraticCurveTo(cx-s*.68,cy+s*.2,cx-s*.42,cy+s*.05); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx+s*.42,cy-s*.2); ctx.quadraticCurveTo(cx+s*.68,cy-s*.2,cx+s*.68,cy+s*.05); ctx.quadraticCurveTo(cx+s*.68,cy+s*.2,cx+s*.42,cy+s*.05); ctx.stroke();
+      // stem
+      ctx.fillStyle=col;
+      ctx.fillRect(cx-s*.08,cy+s*.52,s*.16,s*.22);
+      ctx.fillRect(cx-s*.25,cy+s*.72,s*.5,s*.1);
+    }
+  },
+  {
+    id:3, key:'best',
+    name:'เป็นเลิศรอบด้าน', nameEn:'Ultimate Performer',
+    color:'#F59E0B', colorDark:'#B45309', colorLight:'#FDE68A',
+    quote:"You're the Best! The Ultimate Performer",
+    emoji:'👑',
+    drawIcon(ctx,cx,cy,r,col){
+      // crown
+      ctx.fillStyle=col;
+      ctx.beginPath();
+      ctx.moveTo(cx-r*.55,cy+r*.3);
+      ctx.lineTo(cx-r*.55,cy-r*.1);
+      ctx.lineTo(cx-r*.28,cy+r*.1);
+      ctx.lineTo(cx,cy-r*.45);
+      ctx.lineTo(cx+r*.28,cy+r*.1);
+      ctx.lineTo(cx+r*.55,cy-r*.1);
+      ctx.lineTo(cx+r*.55,cy+r*.3);
+      ctx.closePath(); ctx.fill();
+      // gems
+      [[cx-r*.55,cy-r*.1],[cx,cy-r*.45],[cx+r*.55,cy-r*.1]].forEach(([px,py])=>{
+        ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,r*.09,0,Math.PI*2); ctx.fill();
+      });
+    }
+  },
+  {
+    id:4, key:'heart',
+    name:'บริการตรงใจ', nameEn:'Service with Heart',
+    color:'#EC4899', colorDark:'#BE185D', colorLight:'#FBCFE8',
+    quote:'Service with Heart, Solutions with Tech',
+    emoji:'🫶',
+    drawIcon(ctx,cx,cy,r,col){
+      // hands cupping heart
+      ctx.fillStyle=col;
+      // heart
+      const hy=cy-r*.05;
+      ctx.beginPath();
+      ctx.moveTo(cx,hy+r*.3);
+      ctx.bezierCurveTo(cx+r*.5,hy+r*.05,cx+r*.55,hy-r*.35,cx,hy-r*.05);
+      ctx.bezierCurveTo(cx-r*.55,hy-r*.35,cx-r*.5,hy+r*.05,cx,hy+r*.3);
+      ctx.fill();
+      // left hand arc
+      ctx.strokeStyle=col; ctx.lineWidth=r*.12; ctx.lineCap='round';
+      ctx.beginPath(); ctx.arc(cx-r*.1,cy+r*.45,r*.5,Math.PI*1.15,Math.PI*1.85); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx+r*.1,cy+r*.45,r*.5,Math.PI*1.15,Math.PI*1.85); ctx.stroke();
+    }
+  },
+  {
+    id:5, key:'speed',
+    name:'แก้ไขฉับไว', nameEn:'Fast Resolve',
+    color:'#EF4444', colorDark:'#B91C1C', colorLight:'#FCA5A5',
+    quote:'Speed and Efficiency for Better Living',
+    emoji:'⚡',
+    drawIcon(ctx,cx,cy,r,col){
+      // lightning bolt
+      ctx.fillStyle=col;
+      ctx.beginPath();
+      ctx.moveTo(cx+r*.18,cy-r*.55);
+      ctx.lineTo(cx-r*.28,cy+r*.1);
+      ctx.lineTo(cx+r*.05,cy+r*.1);
+      ctx.lineTo(cx-r*.18,cy+r*.55);
+      ctx.lineTo(cx+r*.28,cy-r*.1);
+      ctx.lineTo(cx-r*.05,cy-r*.1);
+      ctx.closePath(); ctx.fill();
+    }
+  },
+  {
+    id:6, key:'grow',
+    name:'ใส่ใจพัฒนา', nameEn:'Continuous Improvement',
+    color:'#22C55E', colorDark:'#15803D', colorLight:'#BBF7D0',
+    quote:'Never Stop Improving Our City',
+    emoji:'📈',
+    drawIcon(ctx,cx,cy,r,col){
+      // rising bar chart + arrow
+      ctx.fillStyle=col;
+      const bars=[[-.38,.25,.22],[-.1,.1,.22],[.18,-.15,.22]];
+      bars.forEach(([ox,oy,w])=>{
+        ctx.fillRect(cx+ox*r,cy+oy*r,w*r,(r*.4-oy*r));
+      });
+      // arrow
+      ctx.strokeStyle=col; ctx.lineWidth=r*.12; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.beginPath();
+      ctx.moveTo(cx-r*.48,cy+r*.32);
+      ctx.lineTo(cx+r*.45,cy-r*.42);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx+r*.45,cy-r*.42);
+      ctx.lineTo(cx+r*.2,cy-r*.42);
+      ctx.moveTo(cx+r*.45,cy-r*.42);
+      ctx.lineTo(cx+r*.45,cy-r*.18);
+      ctx.stroke();
+    }
+  },
+];
+
+/* ─────────────────────────────────────────────────────────────────────
+   3. STATE
+───────────────────────────────────────────────────────────────────── */
+let userImage     = null;   // HTMLImageElement
+let selectedAward = AWARDS[0];
+let imgOffsetX    = 0, imgOffsetY = 0, imgScale = 1;
+let isDragging    = false, lastX = 0, lastY = 0;
+let pinchDist0    = 0, pinchScale0 = 1;
+
+const OUTPUT_SIZE = 1080;  // px for export canvas
+
+/* ─────────────────────────────────────────────────────────────────────
+   4. BUILD FRAME BUTTONS
+───────────────────────────────────────────────────────────────────── */
+(function buildFrameGrid(){
+  const grid = document.getElementById('frame-grid');
+  AWARDS.forEach(aw=>{
+    const btn = document.createElement('button');
+    btn.className = 'frame-btn rounded-xl p-3 flex flex-col items-center gap-2 bg-navy-dark/70 w-full';
+    btn.dataset.id = aw.id;
+    btn.style.borderColor = aw.colorDark;
+
+    // mini icon canvas
+    const ic = document.createElement('canvas');
+    ic.width = ic.height = 48;
+    const ctx2 = ic.getContext('2d');
+    // bg circle
+    ctx2.fillStyle = aw.colorDark+'33';
+    ctx2.beginPath(); ctx2.arc(24,24,22,0,Math.PI*2); ctx2.fill();
+    aw.drawIcon(ctx2,24,24,18,aw.color);
+    btn.appendChild(ic);
+
+    const label = document.createElement('span');
+    label.className = 'text-xs font-prompt font-semibold text-center leading-tight';
+    label.style.color = aw.colorLight;
+    label.textContent = aw.name;
+    btn.appendChild(label);
+
+    const dot = document.createElement('div');
+    dot.className = 'w-3 h-3 rounded-full mt-0.5 border border-white/20';
+    dot.style.background = aw.color;
+    btn.appendChild(dot);
+
+    btn.addEventListener('click', ()=> selectAward(aw));
+    grid.appendChild(btn);
+  });
+})();
+
+function selectAward(aw){
+  selectedAward = aw;
+  document.querySelectorAll('.frame-btn').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.id)===aw.id);
+  });
+  renderCanvas();
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   5. FILE INPUT / DROP
+───────────────────────────────────────────────────────────────────── */
+function onFileSelected(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  loadImageFile(file);
+  // reset input so same file can be re-selected
+  e.target.value = '';
+}
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', ()=> dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(file && file.type.startsWith('image/')) loadImageFile(file);
+});
+
+function loadImageFile(file){
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      userImage = img;
+      resetTransform();
+      showPhotoSections();
+      renderCanvas();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showPhotoSections(){
+  ['preview-section','frame-section','share-section'].forEach(id=>{
+    document.getElementById(id).classList.remove('hidden');
+  });
+  document.getElementById('preview-shell').classList.add('glowing');
+  // select first award by default
+  selectAward(AWARDS[0]);
+  setTimeout(()=>{
+    document.getElementById('preview-section').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 150);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   6. PAN & ZOOM  (mouse + touch)
+───────────────────────────────────────────────────────────────────── */
+const wrap = document.getElementById('canvas-wrap');
+
+wrap.addEventListener('mousedown', e=>{ isDragging=true; lastX=e.clientX; lastY=e.clientY; });
+window.addEventListener('mouseup',  ()=> isDragging=false);
+window.addEventListener('mousemove', e=>{
+  if(!isDragging||!userImage) return;
+  imgOffsetX += (e.clientX-lastX) * 2; imgOffsetY += (e.clientY-lastY) * 2;
+  lastX=e.clientX; lastY=e.clientY;
+  renderCanvas();
+});
+
+wrap.addEventListener('touchstart', e=>{
+  if(e.touches.length===1){ isDragging=true; lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; }
+  else if(e.touches.length===2){ pinchDist0=getTouchDist(e.touches); pinchScale0=imgScale; }
+  e.preventDefault();
+},{passive:false});
+window.addEventListener('touchend',  ()=> isDragging=false);
+window.addEventListener('touchmove', e=>{
+  if(!userImage) return;
+  if(e.touches.length===1 && isDragging){
+    imgOffsetX += (e.touches[0].clientX-lastX)*2.5; imgOffsetY += (e.touches[0].clientY-lastY)*2.5;
+    lastX=e.touches[0].clientX; lastY=e.touches[0].clientY;
+    renderCanvas();
+  } else if(e.touches.length===2){
+    const d=getTouchDist(e.touches);
+    imgScale = Math.max(.5, Math.min(4, pinchScale0*(d/pinchDist0)));
+    document.getElementById('zoom-range').value = imgScale;
+    renderCanvas();
+  }
+  e.preventDefault();
+},{passive:false});
+
+function getTouchDist(touches){
+  const dx=touches[0].clientX-touches[1].clientX;
+  const dy=touches[0].clientY-touches[1].clientY;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
+// wheel zoom on desktop
+wrap.addEventListener('wheel', e=>{
+  if(!userImage) return;
+  imgScale = Math.max(.5,Math.min(4, imgScale - e.deltaY*.001));
+  document.getElementById('zoom-range').value = imgScale;
+  renderCanvas(); e.preventDefault();
+},{passive:false});
+
+function adjustZoom(delta){ setZoom(Math.max(.5,Math.min(4,imgScale+delta))); }
+function setZoom(v){ imgScale=v; document.getElementById('zoom-range').value=v; renderCanvas(); }
+function resetTransform(){ imgOffsetX=0; imgOffsetY=0; imgScale=1; document.getElementById('zoom-range').value=1; if(userImage) renderCanvas(); }
+
+/* ─────────────────────────────────────────────────────────────────────
+   7. CANVAS RENDERING
+───────────────────────────────────────────────────────────────────── */
+const previewCanvas = document.getElementById('photo-canvas');
+
+function getPreviewCanvas(){
+  const shell = document.getElementById('preview-shell');
+  const size  = shell.offsetWidth;
+  previewCanvas.width  = size;
+  previewCanvas.height = size;
+  return previewCanvas;
+}
+
+function renderCanvas(){ drawFrame(getPreviewCanvas(), previewCanvas.width); }
+
+/**
+ * Core draw function – works on any square canvas
+ */
+function drawFrame(canvas, SIZE){
+  const ctx  = canvas.getContext('2d');
+  const aw   = selectedAward;
+  const PAD  = SIZE * .038;
+  const BORD = SIZE * .028;
+  const RIBBON_H = SIZE * .12;
+  const BOTTOM_BAR_H = SIZE * .1;
+
+  ctx.clearRect(0,0,SIZE,SIZE);
+
+  /* ── 7a. Navy background ── */
+  ctx.fillStyle = '#071435';
+  ctx.fillRect(0,0,SIZE,SIZE);
+
+  /* ── 7b. Tech line grid ── */
+  drawTechLines(ctx, SIZE, aw.color);
+
+  /* ── 7c. Cityscape silhouette ── */
+  drawCityscape(ctx, SIZE);
+
+  /* ── 7d. User photo (clipped square with inner padding) ── */
+  if(userImage){
+    const photoArea = SIZE - PAD*2 - BORD*2;
+    const photoY0   = PAD + BORD;
+    drawUserPhoto(ctx, userImage, PAD+BORD, photoY0, photoArea, photoArea, imgOffsetX, imgOffsetY, imgScale);
+  }
+
+  /* ── 7e. Colored border ── */
+  drawBorder(ctx, SIZE, PAD, BORD, aw.color, aw.colorDark);
+
+  /* ── 7f. Bottom info bar (CITY TRANSFORMERS AWARDS + quote) ── */
+  drawBottomBar(ctx, SIZE, BOTTOM_BAR_H, aw);
+
+  /* ── 7g. Award ribbon ── */
+  drawRibbon(ctx, SIZE, RIBBON_H, BOTTOM_BAR_H, aw);
+
+  /* ── 7h. Top-left logo ── */
+  drawLogo(ctx, SIZE, PAD*1.3, aw.color);
+
+  /* ── 7i. Top-right hashtag ── */
+  drawHashtag(ctx, SIZE, PAD*1.3);
+
+  /* ── 7j. Corner sparkles ── */
+  drawSparkles(ctx, SIZE, aw.color);
+}
+
+/* ────────────────── helpers ────────────────── */
+
+function drawTechLines(ctx, S, accentColor){
+  // horizontal dashed lines
+  ctx.strokeStyle = 'rgba(26,58,122,.35)';
+  ctx.lineWidth   = .8;
+  for(let y=0; y<S; y+=S*.055){
+    ctx.beginPath(); ctx.setLineDash([S*.04, S*.02]);
+    ctx.moveTo(0,y); ctx.lineTo(S,y); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // diagonal accent lines
+  ctx.strokeStyle = hexToRgba(accentColor, .08);
+  ctx.lineWidth   = 1;
+  for(let i=-4; i<12; i++){
+    ctx.beginPath();
+    ctx.moveTo(S*i*.12, 0); ctx.lineTo(S*i*.12 + S*.4, S);
+    ctx.stroke();
+  }
+}
+
+function drawCityscape(ctx, S){
+  const pts=[0,.85,.04,.85,.04,.62,.09,.62,.09,.52,.14,.52,.14,.68,.19,.68,.19,.42,.24,.42,.24,.72,.28,.72,.28,.38,.33,.38,.33,.78,.37,.78,.37,.47,.42,.47,.42,.73,.47,.73,.47,.33,.52,.33,.52,.76,.56,.76,.56,.43,.60,.43,.60,.70,.64,.70,.64,.44,.69,.44,.69,.78,.73,.78,.73,.52,.77,.52,.77,.62,.82,.62,.82,.4,.87,.4,.87,.67,.9,.67,.9,.57,.95,.57,.95,.88,1,.88,1,1,0,1];
+  ctx.beginPath();
+  for(let i=0;i<pts.length;i+=2){ const x=pts[i]*S, y=pts[i+1]*S; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+  ctx.closePath();
+  const grd=ctx.createLinearGradient(0,S*.4,0,S);
+  grd.addColorStop(0,'rgba(7,20,53,.0)');
+  grd.addColorStop(1,'rgba(7,20,53,.92)');
+  ctx.fillStyle=grd; ctx.fill();
+
+  // city glow
+  const cg=ctx.createRadialGradient(S/2,S*.5,0,S/2,S*.5,S*.5);
+  cg.addColorStop(0,'rgba(26,58,122,.18)'); cg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=cg; ctx.fillRect(0,0,S,S);
+}
+
+function drawUserPhoto(ctx, img, x, y, w, h, offX, offY, scale){
+  ctx.save();
+  // clip to photo area
+  ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
+
+  const imgAspect = img.width / img.height;
+  let dw, dh;
+  if(imgAspect >= 1){ dh = h*scale; dw = dh*imgAspect; }
+  else              { dw = w*scale; dh = dw/imgAspect; }
+
+  const dx = x + (w-dw)/2 + offX;
+  const dy = y + (h-dh)/2 + offY;
+  ctx.drawImage(img, dx, dy, dw, dh);
+  ctx.restore();
+}
+
+function drawBorder(ctx, S, PAD, BORD, color, colorDark){
+  // outer glow
+  ctx.shadowColor  = color;
+  ctx.shadowBlur   = BORD*3;
+  ctx.strokeStyle  = colorDark;
+  ctx.lineWidth    = BORD*1.4;
+  ctx.strokeRect(PAD + BORD*.7, PAD + BORD*.7, S-PAD*2-BORD*1.4, S-PAD*2-BORD*1.4);
+  ctx.shadowBlur   = 0;
+
+  // main border
+  const grad = ctx.createLinearGradient(0,0,S,S);
+  grad.addColorStop(0, lightenHex(color, 40));
+  grad.addColorStop(.5, color);
+  grad.addColorStop(1, colorDark);
+  ctx.strokeStyle = grad;
+  ctx.lineWidth   = BORD;
+  ctx.strokeRect(PAD + BORD, PAD + BORD, S-PAD*2-BORD*2, S-PAD*2-BORD*2);
+
+  // corner accents
+  const cSize = S*.06;
+  [[PAD,PAD],[S-PAD,PAD],[PAD,S-PAD],[S-PAD,S-PAD]].forEach(([cx,cy], i)=>{
+    ctx.strokeStyle = lightenHex(color,60);
+    ctx.lineWidth   = BORD*.8;
+    ctx.beginPath();
+    const sx = i%2===0?1:-1, sy = i<2?1:-1;
+    ctx.moveTo(cx+sx*cSize, cy);
+    ctx.lineTo(cx,cy);
+    ctx.lineTo(cx,cy+sy*cSize);
+    ctx.stroke();
+  });
+}
+
+function drawBottomBar(ctx, S, H, aw){
+  const y0 = S - H;
+  // gradient bar
+  const g = ctx.createLinearGradient(0, y0, 0, S);
+  g.addColorStop(0,'rgba(7,20,53,.0)');
+  g.addColorStop(.3,'rgba(7,20,53,.88)');
+  g.addColorStop(1,'rgba(7,20,53,1)');
+  ctx.fillStyle=g; ctx.fillRect(0,y0,S,H);
+
+  // event name
+  ctx.fillStyle='#ffffff';
+  ctx.font=`900 ${S*.038}px Montserrat, sans-serif`;
+  ctx.textAlign='center'; ctx.letterSpacing='0.12em';
+  ctx.fillText('CITY TRANSFORMERS AWARDS', S/2, S - H*.52);
+
+  // quote text
+  ctx.fillStyle = hexToRgba(aw.color, .85);
+  ctx.font=`italic 400 ${S*.024}px Montserrat, sans-serif`;
+  ctx.letterSpacing='0.05em';
+  // wrap quote if too long
+  wrapText(ctx, `"${aw.quote}"`, S/2, S - H*.28, S*.85, S*.026);
+}
+
+function drawRibbon(ctx, S, RIBBON_H, BOTTOM_BAR_H, aw){
+  const ribbonY = S - BOTTOM_BAR_H - RIBBON_H;
+  const ribbonH = RIBBON_H * .65;
+  const rY = ribbonY + (RIBBON_H - ribbonH)/2;
+
+  // ribbon bg
+  const g = ctx.createLinearGradient(0, rY, 0, rY+ribbonH);
+  g.addColorStop(0, aw.colorDark);
+  g.addColorStop(1, hexToRgba(aw.colorDark,.7));
+  ctx.fillStyle=g;
+  // tapered ends
+  ctx.beginPath();
+  ctx.moveTo(S*.04, rY); ctx.lineTo(S*.96, rY);
+  ctx.lineTo(S*.98, rY+ribbonH/2); ctx.lineTo(S*.96, rY+ribbonH);
+  ctx.lineTo(S*.04, rY+ribbonH); ctx.lineTo(S*.02, rY+ribbonH/2);
+  ctx.closePath(); ctx.fill();
+
+  // ribbon sheen
+  const sh=ctx.createLinearGradient(0,rY,0,rY+ribbonH*.5);
+  sh.addColorStop(0,'rgba(255,255,255,.18)'); sh.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sh;
+  ctx.beginPath();
+  ctx.moveTo(S*.04,rY); ctx.lineTo(S*.96,rY);
+  ctx.lineTo(S*.98,rY+ribbonH/2); ctx.lineTo(S*.96,rY+ribbonH*.5);
+  ctx.lineTo(S*.04,rY+ribbonH*.5); ctx.lineTo(S*.02,rY+ribbonH/2);
+  ctx.closePath(); ctx.fill();
+
+  // icon on ribbon
+  const iconR = ribbonH*.35;
+  const iconX = S/2 - (S*.18);
+  const iconY = rY + ribbonH/2;
+  aw.drawIcon(ctx, iconX, iconY, iconR, '#ffffff');
+
+  // award name text (centered in ribbon)
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=6;
+  ctx.font=`700 ${S*.036}px Prompt, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '0.03em';
+  ctx.fillText(aw.name, S/2 + S*.06, rY + ribbonH*.66);
+  ctx.shadowBlur=0;
+}
+
+function drawLogo(ctx, S, PAD, accentColor){
+  const x0 = PAD + S*.04;
+  const y0  = PAD + S*.04;
+  const R   = S*.04;
+
+  // circle bg
+  ctx.fillStyle = 'rgba(7,20,53,.75)';
+  ctx.beginPath(); ctx.arc(x0+R, y0+R, R*1.5, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = accentColor; ctx.lineWidth = R*.12;
+  ctx.beginPath(); ctx.arc(x0+R, y0+R, R*1.5, 0, Math.PI*2); ctx.stroke();
+
+  // megaphone icon (simplified)
+  ctx.fillStyle = accentColor;
+  ctx.beginPath();
+  ctx.moveTo(x0+R*1.9, y0+R*.5);
+  ctx.lineTo(x0+R*.8,  y0+R*.85);
+  ctx.lineTo(x0+R*.8,  y0+R*1.15);
+  ctx.lineTo(x0+R*1.9, y0+R*1.5);
+  ctx.closePath(); ctx.fill();
+  // speaker box
+  ctx.fillStyle = '#E8EEF4';
+  ctx.fillRect(x0+R*.55, y0+R*.82, R*.28, R*.36);
+  // stand
+  ctx.strokeStyle='#E8EEF4'; ctx.lineWidth=R*.1;
+  ctx.beginPath(); ctx.moveTo(x0+R*.68,y0+R*1.18); ctx.lineTo(x0+R*.6,y0+R*1.5); ctx.stroke();
+
+  // text
+  ctx.fillStyle = '#ffffff';
+  ctx.font=`800 ${S*.024}px Montserrat, sans-serif`;
+  ctx.textAlign='left';
+  ctx.letterSpacing='0.05em';
+  ctx.fillText('TRAFFY*', x0 + S*.005, y0 + R*3.2);
+}
+
+function drawHashtag(ctx, S, PAD){
+  const fs = S*.024;
+  ctx.font=`700 ${fs}px Montserrat, sans-serif`;
+  ctx.textAlign='right';
+  ctx.fillStyle='rgba(255,255,255,.88)';
+  ctx.letterSpacing='0.04em';
+  ctx.fillText('#FondueAward2026', S - PAD - S*.04, PAD + S*.072);
+}
+
+function drawSparkles(ctx, S, color){
+  const positions=[[S*.12,S*.18],[S*.88,S*.22],[S*.06,S*.5],[S*.94,S*.45]];
+  positions.forEach(([px,py],i)=>{
+    const r=S*.012*(i%2===0?.8:1.1);
+    ctx.fillStyle=hexToRgba(color,.5+i*.1);
+    // 4-point star
+    ctx.beginPath();
+    for(let a=0;a<Math.PI*2;a+=Math.PI/2){
+      const pr = a%(Math.PI)===0?r:r*.35;
+      const ox=Math.cos(a+Math.PI/4)*pr, oy=Math.sin(a+Math.PI/4)*pr;
+      a===0?ctx.moveTo(px+Math.cos(a)*r,py+Math.sin(a)*r):ctx.lineTo(px+Math.cos(a)*r,py+Math.sin(a)*r);
+      ctx.lineTo(px+ox,py+oy);
+    }
+    ctx.closePath(); ctx.fill();
+  });
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH){
+  const words=text.split(' ');
+  let line='';
+  let curY=y;
+  words.forEach((w,i)=>{
+    const test=line+(line?'' :'')+w+' ';
+    if(ctx.measureText(test).width>maxW && i>0){ ctx.fillText(line.trim(),x,curY); line=w+' '; curY+=lineH; }
+    else line=test;
+  });
+  ctx.fillText(line.trim(),x,curY);
+}
+
+/* ────────────── Color Utilities ────────────── */
+function hexToRgba(hex, a){
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function lightenHex(hex, pct){
+  let r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  r=Math.min(255,r+pct); g=Math.min(255,g+pct); b=Math.min(255,b+pct);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   8. EXPORT (high-res 1080px)
+───────────────────────────────────────────────────────────────────── */
+function buildExportCanvas(){
+  const ec = document.createElement('canvas');
+  ec.width = ec.height = OUTPUT_SIZE;
+  drawFrame(ec, OUTPUT_SIZE);
+  return ec;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   9. DOWNLOAD
+───────────────────────────────────────────────────────────────────── */
+function downloadPhoto(){
+  if(!userImage){ showToast('⚠️ กรุณาอัปโหลดรูปก่อนนะ!'); return; }
+  const ec   = buildExportCanvas();
+  const link = document.createElement('a');
+  link.download = `TraffyAward_${selectedAward.key}_${Date.now()}.png`;
+  link.href      = ec.toDataURL('image/png');
+  link.click();
+  showToast('✅ บันทึกรูปแล้ว!');
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   10. SHARE  (Web Share API)
+───────────────────────────────────────────────────────────────────── */
+async function sharePhoto(){
+  if(!userImage){ showToast('⚠️ กรุณาอัปโหลดรูปก่อนนะ!'); return; }
+  const ec = buildExportCanvas();
+  ec.toBlob(async blob=>{
+    const file = new File([blob], `FondueAward2026_${selectedAward.key}.png`, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({
+          files: [file],
+          title: 'Traffy Fondue: City Transformers Awards 2026',
+          text:  `ฉันได้รับรางวัล "${selectedAward.name}" 🏆\n${selectedAward.quote}\n#FondueAward2026 #TraffyFondue`
+        });
+        showToast('✅ แชร์เรียบร้อย!');
+      } catch(err){
+        if(err.name!=='AbortError') fallbackDownload(ec);
+      }
+    } else {
+      fallbackDownload(ec);
+    }
+  }, 'image/png');
+}
+
+function fallbackDownload(ec){
+  const link = document.createElement('a');
+  link.download = `FondueAward2026.png`;
+  link.href = ec.toDataURL('image/png');
+  link.click();
+  showToast('💾 บราวเซอร์นี้ไม่รองรับ Share – บันทึกให้แล้ว!');
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   11. TOAST
+───────────────────────────────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 3000);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   12. RE-RENDER on RESIZE
+───────────────────────────────────────────────────────────────────── */
+let resizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(()=>{ if(userImage) renderCanvas(); }, 200);
+});
+
+</script>
+
+<!-- ── final task markers (invisible) ──────────────────────────────── -->
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
