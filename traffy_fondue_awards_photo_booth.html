@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Traffy Fondue Awards 2026 - Photo Booth</title>
+    
+    <!-- Google Fonts: Prompt (Thai) & Montserrat (Eng/Num) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nstdaBlue: '#002D63', // Deep Blue CI
+                        nstdaSilver: '#E0E0E0', // Silver CI
+                        traffyBrown: '#714727', // Traffy CI
+                    },
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                        en: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { background-color: #f8fafc; overflow-x: hidden; }
+        /* Hide scrollbar for award selector */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth slider styling */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 20px;
+            border-radius: 50%; background: #714727; cursor: pointer;
+            margin-top: -8px; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer;
+            background: #cbd5e1; border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Header (NSTDA CI) -->
+    <header class="bg-nstdaBlue text-white shadow-md z-10 sticky top-0">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center text-nstdaSilver">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-camera-retro text-xl"></i>
+                <h1 class="font-bold text-lg font-en tracking-wide">TF AWARDS <span class="text-white">2026</span></h1>
+            </div>
+            <div class="text-xs opacity-80">Photo Booth</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-3xl mx-auto p-4 flex flex-col gap-6">
+        
+        <!-- Canvas Container -->
+        <div class="w-full relative aspect-square bg-gray-200 rounded-xl shadow-inner overflow-hidden border-2 border-gray-300" id="canvas-container">
+            <!-- Text instruction before upload -->
+            <div id="upload-instruction" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 pointer-events-none">
+                <i class="fa-solid fa-cloud-arrow-up text-4xl mb-2 text-traffyBrown"></i>
+                <p class="font-medium text-center px-4">แตะปุ่มด้านล่างเพื่อถ่ายภาพ<br>หรืออัปโหลดรูปภาพของคุณ</p>
+            </div>
+            
+            <canvas id="photoCanvas" class="w-full h-full cursor-grab active:cursor-grabbing touch-none"></canvas>
+        </div>
+
+        <!-- Controls Area -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-5">
+            
+            <!-- Upload & Zoom -->
+            <div class="flex flex-col gap-3">
+                <label for="imageUpload" class="bg-traffyBrown hover:bg-[#5a381f] text-white py-3 px-4 rounded-lg text-center font-medium cursor-pointer transition-colors shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-camera"></i> ถ่ายภาพ / อัปโหลด
+                </label>
+                <input type="file" id="imageUpload" accept="image/*" capture="environment" class="hidden">
+                
+                <div class="flex items-center gap-3 px-2 mt-2 opacity-50 transition-opacity duration-300" id="zoom-control-group">
+                    <i class="fa-solid fa-image text-gray-400 text-sm"></i>
+                    <input type="range" id="zoomSlider" min="0.5" max="3" step="0.01" value="1" disabled>
+                    <i class="fa-solid fa-image text-gray-400 text-lg"></i>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <!-- Frame Selection -->
+            <div>
+                <h3 class="text-center font-semibold mb-3 text-sm text-gray-600 uppercase tracking-wide">เลือกกรอบภาพรางวัล</h3>
+                <!-- Horizontal Scroll Container -->
+                <div class="flex overflow-x-auto hide-scroll gap-3 pb-2 snap-x snap-mandatory" id="award-selector">
+                    <!-- Buttons generated by JS -->
+                </div>
+            </div>
+
+            <!-- Actions: Download & Share -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button id="btnDownload" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 border border-gray-300 shadow-sm disabled:opacity-50" disabled>
+                    <i class="fa-solid fa-download"></i> บันทึกรูป
+                </button>
+                <button id="btnShare" class="bg-nstdaBlue hover:bg-[#001d40] text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-md disabled:opacity-50" disabled>
+                    <i class="fa-solid fa-share-nodes"></i> แชร์โซเชียล
+                </button>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        // --- Data Configuration ---
+        const awardsData = [
+            { id: 1, name: "ผู้ร่วมขับเคลื่อนเมือง", color: "#714727", icon: "📣", faClass: "fa-bullhorn", quote: "We build a city for a better life", subline: "งานของเรา สร้างเมืองที่ดีกว่าเดิม", shareQuote: "ภูมิใจที่ได้เป็นส่วนหนึ่งของสิ่งนี้" },
+            { id: 2, name: "ทราฟฟี่ฟองดูว์ ทั้งจังหวัด", color: "#714727", icon: "🗺️", faClass: "fa-map", quote: "New Power, Better Solutions", subline: "ครอบคลุมทุกพื้นที่ ดูแลทุกเรื่องของประชาชน", shareQuote: "เราดูแลทั้งจังหวัดด้วยกัน" },
+            { id: 3, name: "รับแจ้งเกิน 100,000 เคส", color: "#FFD700", icon: "🏆", faClass: "fa-trophy", quote: "Milestone of Trust and Dedication", subline: "ทุกเรื่องที่รับแจ้ง คือความไว้ใจที่เราไม่มองข้าม", shareQuote: "แสนเคส แสนความตั้งใจ" },
+            { id: 4, name: "รับแจ้งเกิน 1,000,000 เคส", color: "#00744B", icon: "🏆", faClass: "fa-trophy", quote: "Milestone of Trust and Dedication", subline: "หนึ่งล้านเรื่อง หนึ่งล้านครั้งที่เราไม่ยอมแพ้", shareQuote: "ล้านเคส ล้านความทุ่มเท" },
+            { id: 5, name: "เป็นเลิศรอบด้าน", color: "#2563EB", icon: "👑", faClass: "fa-crown", quote: "You're the Best! The Ultimate Performer", subline: "ทำดีในทุกขั้นตอน เพราะประชาชนสมควรได้รับสิ่งที่ดีที่สุด", shareQuote: "ทีมเรา ดีในทุกด้าน" },
+            { id: 6, name: "บริการตรงใจ", color: "#E91E63", icon: "❤️", faClass: "fa-heart", quote: "Service with Heart, Solutions with Tech", subline: "รับฟังจริง ตอบสนองจริง นั่นคือมาตรฐานของทีมเรา", shareQuote: "เราฟัง แล้วเราทำ" },
+            { id: 7, name: "แก้ไขฉับไว", color: "#F97316", icon: "⚡", faClass: "fa-bolt", quote: "Speed and Efficiency for Better Living", subline: "ยิ่งเร็ว ยิ่งแสดงว่าเราใส่ใจ", shareQuote: "ทีมเราเร็ว เพราะเราใส่ใจ" },
+            { id: 8, name: "ใส่ใจพัฒนา", color: "#16A34A", icon: "📈", faClass: "fa-chart-line", quote: "Never Stop Improving Our City", subline: "ไม่หยุดแค่ดีพอ เพราะบริการที่ดีกว่า สร้างได้เสมอ", shareQuote: "เราพัฒนาทุกวัน เพื่อทุกคน" }
+        ];
+
+        let selectedAwardIndex = 0;
+
+        // --- Canvas & State Variables ---
+        const canvas = document.getElementById('photoCanvas');
+        const ctx = canvas.getContext('2d');
+        const CANVAS_SIZE = 1200; // High resolution output
+        canvas.width = CANVAS_SIZE;
+        canvas.height = CANVAS_SIZE;
+
+        let userImage = null;
+        let imgX = 0, imgY = 0, imgScale = 1;
+        
+        // Interaction variables
+        let isDragging = false;
+        let startX, startY;
+        let initialPinchDistance = null;
+        let initialScale = 1;
+
+        // Load Logos (Preload)
+        const logoNSTDA = new Image();
+        logoNSTDA.src = 'logo-nstda.webp'; 
+        const logoTraffy = new Image();
+        logoTraffy.src = 'logo-traffy.webp';
+
+        // --- Initialize UI ---
+        function initAwardsUI() {
+            const container = document.getElementById('award-selector');
+            awardsData.forEach((award, index) => {
+                const btn = document.createElement('button');
+                btn.className = `snap-center shrink-0 w-28 h-24 rounded-xl flex flex-col items-center justify-center p-2 border-2 transition-all duration-300 ${index === selectedAwardIndex ? 'border-nstdaBlue shadow-md scale-105 bg-blue-50' : 'border-gray-200 bg-white opacity-80 hover:opacity-100'}`;
+                btn.style.borderColor = index === selectedAwardIndex ? award.color : '#e5e7eb';
+                
+                btn.innerHTML = `
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center mb-1 text-white text-lg shadow-sm" style="background-color: ${award.color}">
+                        <i class="fa-solid ${award.faClass}"></i>
+                    </div>
+                    <span class="text-[10px] font-medium leading-tight text-center line-clamp-2">${award.name}</span>
+                `;
+                
+                btn.onclick = () => {
+                    selectedAwardIndex = index;
+                    initAwardsUI(); // Re-render to update active state
+                    renderCanvas();
+                };
+                container.appendChild(btn);
+            });
+            // Clear previous buttons on re-render (hacky but works for small lists)
+            if(container.children.length > awardsData.length) {
+                 container.innerHTML = '';
+                 initAwardsUI();
+                 return;
+            }
+        }
+        initAwardsUI();
+
+        // --- Canvas Rendering Logic ---
+        function renderCanvas() {
+            // Clear Canvas
+            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+            const award = awardsData[selectedAwardIndex];
+
+            // 1. Draw User Image
+            if (userImage) {
+                const drawWidth = userImage.width * imgScale;
+                const drawHeight = userImage.height * imgScale;
+                ctx.drawImage(userImage, imgX, imgY, drawWidth, drawHeight);
+                document.getElementById('upload-instruction').style.display = 'none';
+            } else {
+                // Background pattern if no image
+                ctx.fillStyle = "#f1f5f9";
+                ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            }
+
+            // 2. Draw Frame Border
+            const borderWidth = 30;
+            ctx.strokeStyle = award.color;
+            ctx.lineWidth = borderWidth;
+            ctx.strokeRect(borderWidth/2, borderWidth/2, CANVAS_SIZE - borderWidth, CANVAS_SIZE - borderWidth);
+
+            // Inner subtle border
+            ctx.strokeStyle = "rgba(255,255,255,0.8)";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(borderWidth, borderWidth, CANVAS_SIZE - (borderWidth*2), CANVAS_SIZE - (borderWidth*2));
+
+            // 3. Draw Logos (Top)
+            const logoMargin = 50;
+            const logoHeight = 80;
+            
+            // NSTDA (Left)
+            if (logoNSTDA.complete && logoNSTDA.naturalHeight !== 0) {
+                const ratio = logoNSTDA.width / logoNSTDA.height;
+                ctx.drawImage(logoNSTDA, logoMargin, logoMargin, logoHeight * ratio, logoHeight);
+            } else {
+                // Fallback text if image not found
+                ctx.fillStyle = "rgba(255,255,255,0.9)";
+                ctx.beginPath(); roundRect(ctx, logoMargin, logoMargin, 160, 60, 10); ctx.fill();
+                ctx.fillStyle = "#000"; ctx.font = "600 24px Prompt"; ctx.textAlign = "left";
+                ctx.fillText("NSTDA Logo", logoMargin + 15, logoMargin + 40);
+            }
+
+            // Traffy (Right)
+            if (logoTraffy.complete && logoTraffy.naturalHeight !== 0) {
+                const ratio = logoTraffy.width / logoTraffy.height;
+                const lw = logoHeight * ratio;
+                ctx.drawImage(logoTraffy, CANVAS_SIZE - logoMargin - lw, logoMargin, lw, logoHeight);
+            } else {
+                 // Fallback
+                ctx.fillStyle = "rgba(255,255,255,0.9)";
+                ctx.beginPath(); roundRect(ctx, CANVAS_SIZE - logoMargin - 160, logoMargin, 160, 60, 10); ctx.fill();
+                ctx.fillStyle = "#000"; ctx.font = "600 24px Prompt"; ctx.textAlign = "right";
+                ctx.fillText("Traffy Logo", CANVAS_SIZE - logoMargin - 15, logoMargin + 40);
+            }
+
+            // 4. Draw Bottom Overlay Gradient for text readability
+            const gradient = ctx.createLinearGradient(0, CANVAS_SIZE - 400, 0, CANVAS_SIZE);
+            gradient.addColorStop(0, "rgba(0,0,0,0)");
+            gradient.addColorStop(0.5, "rgba(0,0,0,0.6)");
+            gradient.addColorStop(1, "rgba(0,0,0,0.85)");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, CANVAS_SIZE - 450, CANVAS_SIZE, 450);
+
+            // 5. Draw Bottom Elements (Center Aligned)
+            ctx.textAlign = "center";
+            const centerX = CANVAS_SIZE / 2;
+
+            // Ribbon 1: Subtitle
+            ctx.fillStyle = award.color === '#FFD700' ? "#000" : "#fff"; // Dark text if yellow frame
+            ctx.font = "500 32px Prompt";
+            
+            // Draw small pill background for Subtitle
+            const subWidth = ctx.measureText("ขอเชิดชูเกียรติหน่วยงานดีเด่น").width + 60;
+            ctx.fillStyle = "rgba(255,255,255,0.95)";
+            ctx.beginPath(); roundRect(ctx, centerX - subWidth/2, CANVAS_SIZE - 340, subWidth, 50, 25); ctx.fill();
+            
+            ctx.fillStyle = award.color;
+            ctx.fillText("ขอเชิดชูเกียรติหน่วยงานดีเด่น", centerX, CANVAS_SIZE - 305);
+
+            // Ribbon 2: Award Name + Icon
+            const mainFont = "700 64px Prompt";
+            ctx.font = mainFont;
+            const awardText = `${award.icon} ${award.name}`;
+            const awardTextWidth = ctx.measureText(awardText).width + 120;
+            
+            ctx.fillStyle = award.color;
+            // Shadow for the ribbon
+            ctx.shadowColor = "rgba(0,0,0,0.3)"; ctx.shadowBlur = 15; ctx.shadowOffsetY = 8;
+            ctx.beginPath(); roundRect(ctx, centerX - awardTextWidth/2, CANVAS_SIZE - 270, awardTextWidth, 100, 50); ctx.fill();
+            ctx.shadowColor = "transparent"; // reset shadow
+            
+            ctx.fillStyle = award.color === '#FFD700' ? "#000" : "#fff";
+            ctx.fillText(awardText, centerX, CANVAS_SIZE - 195);
+
+            // Quote (English)
+            ctx.fillStyle = "rgba(255,255,255,0.9)";
+            ctx.font = "italic 400 36px Montserrat";
+            ctx.fillText(`"${award.quote}"`, centerX, CANVAS_SIZE - 100);
+
+            // Footer / Title
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
+            ctx.font = "600 24px Montserrat";
+            ctx.fillText("TRAFFY FONDUE AWARDS 2026", centerX, CANVAS_SIZE - 50);
+        }
+
+        // Helper function to draw rounded rectangle in canvas
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+        }
+
+        // --- Image Upload Logic ---
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    userImage = img;
+                    // Calculate initial scale to cover the canvas (Center Crop)
+                    const scaleX = CANVAS_SIZE / img.width;
+                    const scaleY = CANVAS_SIZE / img.height;
+                    imgScale = Math.max(scaleX, scaleY);
+                    
+                    // Center the image
+                    imgX = (CANVAS_SIZE - img.width * imgScale) / 2;
+                    imgY = (CANVAS_SIZE - img.height * imgScale) / 2;
+                    
+                    // Reset and enable slider
+                    const slider = document.getElementById('zoomSlider');
+                    slider.disabled = false;
+                    slider.min = imgScale * 0.5;
+                    slider.max = imgScale * 3;
+                    slider.value = imgScale;
+                    document.getElementById('zoom-control-group').classList.remove('opacity-50');
+
+                    // Enable buttons
+                    document.getElementById('btnDownload').disabled = false;
+                    document.getElementById('btnShare').disabled = false;
+
+                    renderCanvas();
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // --- Interaction Logic (Pan & Zoom) ---
+        
+        // Zoom Slider
+        document.getElementById('zoomSlider').addEventListener('input', function(e) {
+            if(!userImage) return;
+            const newScale = parseFloat(e.target.value);
+            // Adjust position so it zooms towards center
+            const centerX = CANVAS_SIZE/2;
+            const centerY = CANVAS_SIZE/2;
+            
+            imgX = centerX - (centerX - imgX) * (newScale / imgScale);
+            imgY = centerY - (centerY - imgY) * (newScale / imgScale);
+            
+            imgScale = newScale;
+            renderCanvas();
+        });
+
+        // Mouse/Touch Drag for Canvas
+        function getEventPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Calculate scale ratio between internal canvas size and actual DOM size
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            if (e.touches && e.touches.length > 0) {
+                return { 
+                    x: (e.touches[0].clientX - rect.left) * scaleX, 
+                    y: (e.touches[0].clientY - rect.top) * scaleY 
+                };
+            }
+            return { 
+                x: (e.clientX - rect.left) * scaleX, 
+                y: (e.clientY - rect.top) * scaleY 
+            };
+        }
+
+        function startDrag(e) {
+            if (!userImage) return;
+            // Prevent default scrolling on touch
+            if(e.type === 'touchstart') e.preventDefault();
+            
+            isDragging = true;
+            const pos = getEventPos(e);
+            startX = pos.x - imgX;
+            startY = pos.y - imgY;
+        }
+
+        function doDrag(e) {
+            if (!isDragging || !userImage) return;
+            e.preventDefault();
+            const pos = getEventPos(e);
+            imgX = pos.x - startX;
+            imgY = pos.y - startY;
+            renderCanvas();
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        canvas.addEventListener('mousedown', startDrag);
+        canvas.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', endDrag);
+
+        canvas.addEventListener('touchstart', startDrag, {passive: false});
+        canvas.addEventListener('touchmove', doDrag, {passive: false});
+        window.addEventListener('touchend', endDrag);
+
+        // --- Action Buttons ---
+        
+        // Generate Share Text
+        function getShareContent() {
+            const award = awardsData[selectedAwardIndex];
+            return `ภูมิใจที่ทีมเราได้รับรางวัล ${award.name}\n${award.subline}\n"${award.shareQuote}"\n#TraffyFondueAwards\n\nTraffy Fondue Awards 2026\n"เทคโนโลยีที่มีความหมาย เกิดจากพลังของทุกคน"`;
+        }
+
+        // Download logic
+        document.getElementById('btnDownload').addEventListener('click', function() {
+            if (!userImage) return;
+            const link = document.createElement('a');
+            link.download = `Traffy-Award-${awardsData[selectedAwardIndex].name}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        });
+
+        // Web Share API Logic
+        document.getElementById('btnShare').addEventListener('click', async function() {
+            if (!userImage) return;
+            
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังเตรียมแชร์...';
+            
+            const shareText = getShareContent();
+
+            try {
+                // Convert Canvas to Blob for sharing
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'tf-award.png', { type: 'image/png' });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        // Native Mobile Share
+                        await navigator.share({
+                            title: 'Traffy Fondue Awards 2026',
+                            text: shareText,
+                            files: [file]
+                        });
+                    } else {
+                        // Fallback for Desktop / Unsupported browsers
+                        // Copy text to clipboard and trigger download
+                        try {
+                            await navigator.clipboard.writeText(shareText);
+                            alert('คัดลอกข้อความแคปชั่นเรียบร้อยแล้ว!\nระบบจะทำการโหลดรูปภาพให้คุณเพื่อนำไปโพสต์');
+                            document.getElementById('btnDownload').click();
+                        } catch (err) {
+                            // Fallback to execCommand if clipboard API fails in iframe
+                            const textArea = document.createElement("textarea");
+                            textArea.value = shareText;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(textArea);
+                            alert('คัดลอกข้อความแคปชั่นเรียบร้อยแล้ว!\nระบบจะทำการโหลดรูปภาพให้คุณเพื่อนำไปโพสต์');
+                            document.getElementById('btnDownload').click();
+                        }
+                    }
+                }, 'image/png', 1.0);
+            } catch (error) {
+                console.error("Error sharing:", error);
+                alert("เกิดข้อผิดพลาดในการแชร์ กรุณาลองบันทึกรูปภาพแทนครับ");
+            } finally {
+                setTimeout(() => { btn.innerHTML = originalText; }, 1000);
+            }
+        });
+
+        // Trigger initial render
+        logoNSTDA.onload = renderCanvas;
+        logoTraffy.onload = renderCanvas;
+        renderCanvas();
+
+    </script>
+</body>
+</html>
