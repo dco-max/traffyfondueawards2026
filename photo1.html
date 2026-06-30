@@ -1,0 +1,908 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Traffy Fondue Awards 2026 - Photo Booth</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nstdaBlue: '#0B3C75',
+            nstdaBlue2: '#1E5AA8',
+            silver: '#C0C7D1',
+            silverSoft: '#E8ECF1',
+            traffyBrown: '#714727',
+            pageBg: '#F5F7FB'
+          },
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            montserrat: ['Montserrat', 'sans-serif']
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(11,60,117,0.12)',
+            card: '0 8px 24px rgba(0,0,0,0.08)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #F5F7FB;
+      color: #1f2937;
+      font-family: 'Prompt', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .award-scroll::-webkit-scrollbar {
+      height: 8px;
+    }
+    .award-scroll::-webkit-scrollbar-thumb {
+      background: rgba(113, 71, 39, 0.35);
+      border-radius: 999px;
+    }
+    .award-scroll::-webkit-scrollbar-track {
+      background: rgba(11, 60, 117, 0.06);
+    }
+
+    .safe-bottom {
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    }
+
+    .btn-primary {
+      background: #714727;
+      color: white;
+      transition: 0.2s ease;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #0B3C75;
+      color: white;
+      transition: 0.2s ease;
+    }
+    .btn-secondary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .award-chip.active {
+      border-color: var(--award-color);
+      background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(243,246,251,1) 100%);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--award-color) 18%, transparent);
+    }
+
+    .canvas-wrap {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #previewCanvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #ffffff;
+      border-radius: 22px;
+    }
+
+    .mini-note {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 380px) {
+      .tiny-stack {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-pageBg font-prompt">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="relative overflow-hidden bg-gradient-to-br from-nstdaBlue via-nstdaBlue2 to-slate-700 text-white">
+      <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_white,_transparent_32%)]"></div>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-7 sm:pt-8 sm:pb-8 relative">
+        <div class="flex flex-col gap-4 items-center text-center">
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 border border-white/15 backdrop-blur-sm">
+            <i class="fa-solid fa-camera-retro text-silverSoft"></i>
+            <span class="text-sm sm:text-base font-medium">Photo Booth</span>
+          </div>
+
+          <div>
+            <h1 class="font-bold text-2xl sm:text-4xl leading-tight">
+              Traffy Fondue Awards 2026
+            </h1>
+            <p class="mt-2 text-sm sm:text-base text-slate-100/90 max-w-2xl mx-auto">
+              ถ่ายรูป เลือกกรอบรางวัล และแชร์ความภูมิใจของทีมคุณได้ทันที
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-5 sm:py-8 safe-bottom">
+      <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-6 items-start">
+        <!-- Left: Booth -->
+        <section class="bg-white rounded-3xl shadow-soft p-4 sm:p-6">
+          <div class="flex flex-col gap-4">
+            <!-- Canvas Preview -->
+            <div class="canvas-wrap rounded-3xl border border-slate-200 bg-slate-50">
+              <canvas id="previewCanvas" width="1080" height="1350" aria-label="Photo Booth Preview"></canvas>
+            </div>
+
+            <!-- Upload -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 tiny-stack">
+              <label for="imageInput"
+                class="btn-primary cursor-pointer rounded-2xl px-4 py-4 text-center font-semibold shadow-card flex items-center justify-center gap-3">
+                <i class="fa-solid fa-camera text-base"></i>
+                <span>ถ่ายภาพ / อัปโหลด</span>
+              </label>
+              <button id="resetViewBtn"
+                class="rounded-2xl px-4 py-4 text-center font-semibold border border-slate-300 bg-white hover:bg-slate-50 transition flex items-center justify-center gap-3">
+                <i class="fa-solid fa-expand"></i>
+                <span>รีเซ็ตตำแหน่งรูป</span>
+              </button>
+            </div>
+
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              class="hidden"
+            />
+
+            <!-- Instructions -->
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+              <div class="flex items-start gap-3">
+                <div class="mt-0.5 text-nstdaBlue"><i class="fa-solid fa-hand-pointer"></i></div>
+                <div class="text-sm sm:text-[15px] leading-6 text-slate-700">
+                  <p><strong>วิธีใช้งาน:</strong> อัปโหลดรูป แล้วใช้นิ้วลากรูปเพื่อจัดตำแหน่ง และ pinch เพื่อซูมเข้า-ออก</p>
+                  <p class="mt-1">บนคอมพิวเตอร์: ลากเมาส์เพื่อเลื่อนภาพ และใช้ Mouse Wheel เพื่อซูม</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Award Selector -->
+            <div class="pt-1">
+              <h2 class="text-center font-bold text-lg sm:text-xl text-nstdaBlue mb-4">
+                เลือกกรอบภาพรางวัล
+              </h2>
+
+              <div id="awardList" class="award-scroll flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+                <!-- buttons injected -->
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 tiny-stack">
+              <button id="downloadBtn"
+                class="btn-secondary rounded-2xl px-4 py-4 text-center font-semibold shadow-card flex items-center justify-center gap-3">
+                <i class="fa-solid fa-download"></i>
+                <span>บันทึกรูปลงเครื่อง</span>
+              </button>
+
+              <button id="shareBtn"
+                class="btn-primary rounded-2xl px-4 py-4 text-center font-semibold shadow-card flex items-center justify-center gap-3">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>แชร์โซเชียล</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: Info panel -->
+        <aside class="bg-white rounded-3xl shadow-soft p-4 sm:p-6 xl:sticky xl:top-6">
+          <div class="space-y-5">
+            <div>
+              <h3 class="font-bold text-lg text-nstdaBlue">รายละเอียดกรอบที่เลือก</h3>
+              <div class="mt-3 rounded-2xl border border-slate-200 p-4 bg-slate-50">
+                <div class="flex items-center gap-3">
+                  <div id="selectedAwardIcon"
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-lg shadow"
+                    style="background:#714727">
+                    <i class="fa-solid fa-megaphone"></i>
+                  </div>
+                  <div>
+                    <div id="selectedAwardName" class="font-semibold text-base sm:text-lg">ผู้ร่วมขับเคลื่อนเมือง</div>
+                    <div id="selectedAwardColor" class="text-xs sm:text-sm text-slate-500 font-montserrat">#714727</div>
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <div class="text-xs uppercase tracking-wide text-slate-500 font-montserrat mb-1">Quote</div>
+                  <div id="selectedAwardQuote" class="text-sm sm:text-[15px] leading-6 text-slate-700 font-medium">
+                    We build a city for a better life
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-lg text-nstdaBlue">ข้อความสำหรับแชร์</h3>
+              <div class="mt-3 rounded-2xl border border-slate-200 p-4 bg-slate-50">
+                <p id="shareTextPreview" class="text-sm leading-6 text-slate-700 whitespace-pre-line"></p>
+              </div>
+            </div>
+
+            <div class="rounded-2xl bg-gradient-to-br from-slate-100 to-white border border-slate-200 p-4">
+              <div class="text-sm font-semibold text-traffyBrown">Footer Copy</div>
+              <div class="mt-2 text-nstdaBlue font-bold">Traffy Fondue Awards 2026</div>
+              <div class="mt-1 text-sm text-slate-600 leading-6">
+                "เทคโนโลยีที่มีความหมาย เกิดจากพลังของทุกคน"
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-4 border-t border-slate-200 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center">
+        <div class="font-bold text-nstdaBlue">Traffy Fondue Awards 2026</div>
+        <div class="text-sm text-slate-600 mt-1">"เทคโนโลยีที่มีความหมาย เกิดจากพลังของทุกคน"</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const awards = [
+      {
+        id: 'city-driver',
+        name: 'ผู้ร่วมขับเคลื่อนเมือง',
+        color: '#714727',
+        icon: 'fa-megaphone',
+        emoji: '📣',
+        quote: 'We build a city for a better life',
+        subline: 'งานของเรา สร้างเมืองที่ดีกว่าเดิม',
+        shareQuote: '"ภูมิใจที่ได้เป็นส่วนหนึ่งของสิ่งนี้"'
+      },
+      {
+        id: 'province-wide',
+        name: 'ทราฟฟี่ฟองดูว์ ทั้งจังหวัด',
+        color: '#714727',
+        icon: 'fa-map',
+        emoji: '🗺️',
+        quote: 'New Power, Better Solutions',
+        subline: 'ครอบคลุมทุกพื้นที่ ดูแลทุกเรื่องของประชาชน',
+        shareQuote: '"เราดูแลทั้งจังหวัดด้วยกัน"'
+      },
+      {
+        id: '100k',
+        name: 'รับแจ้งเกิน 100,000 เคส',
+        color: '#FFD700',
+        icon: 'fa-trophy',
+        emoji: '🏆',
+        quote: 'Milestone of Trust and Dedication',
+        subline: 'ทุกเรื่องที่รับแจ้ง คือความไว้ใจที่เราไม่มองข้าม',
+        shareQuote: '"แสนเคส แสนความตั้งใจ"'
+      },
+      {
+        id: '1m',
+        name: 'รับแจ้งเกิน 1,000,000 เคส',
+        color: '#00744B',
+        icon: 'fa-trophy',
+        emoji: '🏆',
+        quote: 'Milestone of Trust and Dedication',
+        subline: 'หนึ่งล้านเรื่อง หนึ่งล้านครั้งที่เราไม่ยอมแพ้',
+        shareQuote: '"ล้านเคส ล้านความทุ่มเท"'
+      },
+      {
+        id: 'ultimate',
+        name: 'เป็นเลิศรอบด้าน',
+        color: '#2563EB',
+        icon: 'fa-crown',
+        emoji: '👑',
+        quote: "You're the Best! The Ultimate Performer",
+        subline: 'ทำดีในทุกขั้นตอน เพราะประชาชนสมควรได้รับสิ่งที่ดีที่สุด',
+        shareQuote: '"ทีมเรา ดีในทุกด้าน"'
+      },
+      {
+        id: 'service-heart',
+        name: 'บริการตรงใจ',
+        color: '#E91E63',
+        icon: 'fa-heart',
+        emoji: '❤️',
+        quote: 'Service with Heart, Solutions with Tech',
+        subline: 'รับฟังจริง ตอบสนองจริง นั่นคือมาตรฐานของทีมเรา',
+        shareQuote: '"เราฟัง แล้วเราทำ"'
+      },
+      {
+        id: 'fast-fix',
+        name: 'แก้ไขฉับไว',
+        color: '#F97316',
+        icon: 'fa-bolt',
+        emoji: '⚡',
+        quote: 'Speed and Efficiency for Better Living',
+        subline: 'ยิ่งเร็ว ยิ่งแสดงว่าเราใส่ใจ',
+        shareQuote: '"ทีมเราเร็ว เพราะเราใส่ใจ"'
+      },
+      {
+        id: 'improve',
+        name: 'ใส่ใจพัฒนา',
+        color: '#16A34A',
+        icon: 'fa-chart-line',
+        emoji: '📈',
+        quote: 'Never Stop Improving Our City',
+        subline: 'ไม่หยุดแค่ดีพอ เพราะบริการที่ดีกว่า สร้างได้เสมอ',
+        shareQuote: '"เราพัฒนาทุกวัน เพื่อทุกคน"'
+      }
+    ];
+
+    // Canvas and UI refs
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageInput = document.getElementById('imageInput');
+    const resetViewBtn = document.getElementById('resetViewBtn');
+    const awardList = document.getElementById('awardList');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+
+    const selectedAwardIcon = document.getElementById('selectedAwardIcon');
+    const selectedAwardName = document.getElementById('selectedAwardName');
+    const selectedAwardColor = document.getElementById('selectedAwardColor');
+    const selectedAwardQuote = document.getElementById('selectedAwardQuote');
+    const shareTextPreview = document.getElementById('shareTextPreview');
+
+    // Canvas state
+    let selectedAward = awards[0];
+    let userImage = null;
+    let traffyLogo = null;
+    let nstdaLogo = null;
+
+    let scale = 1;
+    let minScale = 1;
+    let maxScale = 5;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let startOffsetX = 0;
+    let startOffsetY = 0;
+
+    let pinchStartDistance = 0;
+    let pinchStartScale = 1;
+    let pinchCenter = null;
+
+    const DPR = Math.max(window.devicePixelRatio || 1, 1);
+
+    function buildShareText(award) {
+      return `ภูมิใจที่ทีมเราได้รับรางวัล ${award.name}\n${award.subline}\n${award.shareQuote}\n#TraffyFondueAwards`;
+    }
+
+    function updateSelectedInfo() {
+      selectedAwardIcon.style.background = selectedAward.color;
+      selectedAwardIcon.innerHTML = `<i class="fa-solid ${selectedAward.icon}"></i>`;
+      selectedAwardName.textContent = selectedAward.name;
+      selectedAwardColor.textContent = selectedAward.color.toUpperCase();
+      selectedAwardQuote.textContent = selectedAward.quote;
+      shareTextPreview.textContent = buildShareText(selectedAward);
+    }
+
+    function renderAwardButtons() {
+      awardList.innerHTML = '';
+      awards.forEach((award) => {
+        const btn = document.createElement('button');
+        btn.className = 'award-chip min-w-[220px] sm:min-w-[240px] snap-start rounded-2xl border-2 border-slate-200 bg-white p-4 text-left transition hover:shadow-card';
+        btn.style.setProperty('--award-color', award.color);
+        btn.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center text-white text-lg shrink-0" style="background:${award.color}">
+              <i class="fa-solid ${award.icon}"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-semibold text-sm sm:text-[15px] leading-5 text-slate-800">${award.name}</div>
+              <div class="mt-1 text-xs text-slate-500 font-montserrat">${award.color.toUpperCase()}</div>
+            </div>
+          </div>
+        `;
+        if (award.id === selectedAward.id) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          selectedAward = award;
+          document.querySelectorAll('.award-chip').forEach(el => el.classList.remove('active'));
+          btn.classList.add('active');
+          updateSelectedInfo();
+          drawCanvas();
+        });
+        awardList.appendChild(btn);
+      });
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    function roundedRect(ctx, x, y, w, h, r, fill = true, stroke = false) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function fitImageToPhotoArea() {
+      if (!userImage) return;
+      const photo = getPhotoRect();
+      const imgRatio = userImage.width / userImage.height;
+      const areaRatio = photo.w / photo.h;
+
+      if (imgRatio > areaRatio) {
+        minScale = photo.h / userImage.height;
+      } else {
+        minScale = photo.w / userImage.width;
+      }
+      scale = minScale;
+      maxScale = minScale * 5;
+
+      const drawnW = userImage.width * scale;
+      const drawnH = userImage.height * scale;
+      offsetX = photo.x + (photo.w - drawnW) / 2;
+      offsetY = photo.y + (photo.h - drawnH) / 2;
+    }
+
+    function getPhotoRect() {
+      return {
+        x: 70,
+        y: 145,
+        w: canvas.width - 140,
+        h: 840
+      };
+    }
+
+    function clampImagePosition() {
+      if (!userImage) return;
+      const photo = getPhotoRect();
+      const drawnW = userImage.width * scale;
+      const drawnH = userImage.height * scale;
+
+      if (drawnW <= photo.w) {
+        offsetX = photo.x + (photo.w - drawnW) / 2;
+      } else {
+        const minX = photo.x + photo.w - drawnW;
+        const maxX = photo.x;
+        offsetX = Math.min(maxX, Math.max(minX, offsetX));
+      }
+
+      if (drawnH <= photo.h) {
+        offsetY = photo.y + (photo.h - drawnH) / 2;
+      } else {
+        const minY = photo.y + photo.h - drawnH;
+        const maxY = photo.y;
+        offsetY = Math.min(maxY, Math.max(minY, offsetY));
+      }
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 2) {
+      const words = text.split(' ');
+      let line = '';
+      let lines = [];
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          lines.push(line.trim());
+          line = words[n] + ' ';
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line.trim());
+
+      if (lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        let last = lines[maxLines - 1];
+        while (ctx.measureText(last + '...').width > maxWidth && last.length > 0) {
+          last = last.slice(0, -1);
+        }
+        lines[maxLines - 1] = last + '...';
+      }
+
+      lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+    }
+
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Background
+      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bg.addColorStop(0, '#F8FAFD');
+      bg.addColorStop(1, '#EEF2F7');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Outer frame
+      ctx.fillStyle = selectedAward.color;
+      roundedRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 44, true, false);
+
+      // Inner plate
+      ctx.fillStyle = '#FFFFFF';
+      roundedRect(ctx, 46, 46, canvas.width - 92, canvas.height - 92, 34, true, false);
+
+      // Photo area
+      const photo = getPhotoRect();
+
+      // Photo area shadow plate
+      ctx.save();
+      ctx.fillStyle = '#F3F6FB';
+      roundedRect(ctx, photo.x, photo.y, photo.w, photo.h, 28, true, false);
+      ctx.clip();
+
+      if (userImage) {
+        clampImagePosition();
+        ctx.drawImage(userImage, offsetX, offsetY, userImage.width * scale, userImage.height * scale);
+      } else {
+        const ph = ctx.createLinearGradient(photo.x, photo.y, photo.x, photo.y + photo.h);
+        ph.addColorStop(0, '#E9EEF5');
+        ph.addColorStop(1, '#DCE6F2');
+        ctx.fillStyle = ph;
+        ctx.fillRect(photo.x, photo.y, photo.w, photo.h);
+
+        ctx.fillStyle = '#0B3C75';
+        ctx.globalAlpha = 0.15;
+        ctx.beginPath();
+        ctx.arc(photo.x + photo.w * 0.25, photo.y + photo.h * 0.22, 120, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(photo.x + photo.w * 0.78, photo.y + photo.h * 0.75, 140, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = '#0B3C75';
+        ctx.font = '700 44px Prompt';
+        ctx.textAlign = 'center';
+        ctx.fillText('เพิ่มรูปของคุณที่นี่', photo.x + photo.w / 2, photo.y + photo.h / 2 - 10);
+
+        ctx.fillStyle = '#5B6B84';
+        ctx.font = '500 28px Prompt';
+        ctx.fillText('แตะปุ่ม "ถ่ายภาพ / อัปโหลด"', photo.x + photo.w / 2, photo.y + photo.h / 2 + 42);
+      }
+      ctx.restore();
+
+      // Photo border stroke
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = selectedAward.color;
+      roundedRect(ctx, photo.x, photo.y, photo.w, photo.h, 28, false, true);
+
+      // Logos
+      if (nstdaLogo) {
+        const maxW = 265;
+        const ratio = nstdaLogo.width / nstdaLogo.height;
+        const w = maxW;
+        const h = w / ratio;
+        ctx.drawImage(nstdaLogo, 86, 72, w, h);
+      }
+
+      if (traffyLogo) {
+        const size = 122;
+        ctx.drawImage(traffyLogo, canvas.width - 86 - size, 66, size, size);
+      }
+
+      // Ribbon top compliment
+      const ribW = canvas.width - 220;
+      const ribH = 66;
+      const ribX = (canvas.width - ribW) / 2;
+      const ribY = 1015;
+
+      ctx.save();
+      ctx.fillStyle = '#0B3C75';
+      roundedRect(ctx, ribX, ribY, ribW, ribH, 20, true, false);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '700 31px Prompt';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('ขอเชิดชูเกียรติหน่วยงานดีเด่น', canvas.width / 2, ribY + ribH / 2 + 1);
+      ctx.restore();
+
+      // Event name
+      ctx.fillStyle = '#0B3C75';
+      ctx.font = '800 42px Montserrat';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('Traffy Fondue Award 2026', canvas.width / 2, 1118);
+
+      // Award ribbon
+      const awardRibW = canvas.width - 180;
+      const awardRibH = 82;
+      const awardRibX = (canvas.width - awardRibW) / 2;
+      const awardRibY = 1148;
+
+      ctx.fillStyle = selectedAward.color;
+      roundedRect(ctx, awardRibX, awardRibY, awardRibW, awardRibH, 24, true, false);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // centered icon + text
+      const iconChar = selectedAward.emoji;
+      ctx.font = '700 36px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+      const iconWidth = ctx.measureText(iconChar).width;
+
+      ctx.font = '700 34px Prompt';
+      const labelWidth = ctx.measureText(selectedAward.name).width;
+      const gap = 18;
+      const totalWidth = iconWidth + gap + labelWidth;
+      let startX = canvas.width / 2 - totalWidth / 2;
+
+      ctx.font = '700 36px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+      ctx.fillText(iconChar, startX + iconWidth / 2, awardRibY + awardRibH / 2 + 2);
+
+      ctx.font = '700 34px Prompt';
+      ctx.fillText(selectedAward.name, startX + iconWidth + gap + labelWidth / 2, awardRibY + awardRibH / 2 + 2);
+
+      // Quote
+      ctx.fillStyle = '#334155';
+      ctx.textAlign = 'center';
+      ctx.font = '600 24px Montserrat';
+      wrapText(ctx, selectedAward.quote, canvas.width / 2, 1272, canvas.width - 180, 30, 2);
+    }
+
+    function getCanvasPointerPosition(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX) ?? 0;
+      const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY) ?? 0;
+      const x = (clientX - rect.left) * (canvas.width / rect.width);
+      const y = (clientY - rect.top) * (canvas.height / rect.height);
+      return { x, y };
+    }
+
+    function distanceBetweenTouches(t1, t2) {
+      const dx = t2.clientX - t1.clientX;
+      const dy = t2.clientY - t1.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function getTouchCenter(t1, t2) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = (t1.clientX + t2.clientX) / 2;
+      const clientY = (t1.clientY + t2.clientY) / 2;
+      return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    function zoomAtPoint(newScale, centerX, centerY) {
+      if (!userImage) return;
+
+      const clampedScale = Math.max(minScale, Math.min(maxScale, newScale));
+      const prevScale = scale;
+      if (clampedScale === prevScale) return;
+
+      const imageX = (centerX - offsetX) / prevScale;
+      const imageY = (centerY - offsetY) / prevScale;
+
+      scale = clampedScale;
+      offsetX = centerX - imageX * scale;
+      offsetY = centerY - imageY * scale;
+
+      clampImagePosition();
+      drawCanvas();
+    }
+
+    async function handleFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const img = new Image();
+        img.onload = () => {
+          userImage = img;
+          fitImageToPhotoArea();
+          drawCanvas();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      handleFile(file);
+    });
+
+    resetViewBtn.addEventListener('click', () => {
+      if (!userImage) return;
+      fitImageToPhotoArea();
+      drawCanvas();
+    });
+
+    // Pointer / Mouse drag
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!userImage) return;
+      isDragging = true;
+      canvas.setPointerCapture?.(e.pointerId);
+      const pos = getCanvasPointerPosition(e);
+      dragStartX = pos.x;
+      dragStartY = pos.y;
+      startOffsetX = offsetX;
+      startOffsetY = offsetY;
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      if (!userImage || !isDragging) return;
+      const pos = getCanvasPointerPosition(e);
+      offsetX = startOffsetX + (pos.x - dragStartX);
+      offsetY = startOffsetY + (pos.y - dragStartY);
+      clampImagePosition();
+      drawCanvas();
+    });
+
+    const endDrag = (e) => {
+      isDragging = false;
+      try { canvas.releasePointerCapture?.(e.pointerId); } catch (_) {}
+    };
+
+    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointercancel', endDrag);
+    canvas.addEventListener('pointerleave', () => { isDragging = false; });
+
+    // Wheel zoom
+    canvas.addEventListener('wheel', (e) => {
+      if (!userImage) return;
+      e.preventDefault();
+      const pos = getCanvasPointerPosition(e);
+      const delta = e.deltaY < 0 ? 1.08 : 0.92;
+      zoomAtPoint(scale * delta, pos.x, pos.y);
+    }, { passive: false });
+
+    // Touch pinch
+    canvas.addEventListener('touchstart', (e) => {
+      if (!userImage) return;
+
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        dragStartX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        dragStartY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        startOffsetX = offsetX;
+        startOffsetY = offsetY;
+      } else if (e.touches.length === 2) {
+        pinchStartDistance = distanceBetweenTouches(e.touches[0], e.touches[1]);
+        pinchStartScale = scale;
+        pinchCenter = getTouchCenter(e.touches[0], e.touches[1]);
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!userImage) return;
+      e.preventDefault();
+
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        offsetX = startOffsetX + (x - dragStartX);
+        offsetY = startOffsetY + (y - dragStartY);
+        clampImagePosition();
+        drawCanvas();
+      } else if (e.touches.length === 2) {
+        const newDistance = distanceBetweenTouches(e.touches[0], e.touches[1]);
+        const factor = newDistance / pinchStartDistance;
+        zoomAtPoint(pinchStartScale * factor, pinchCenter.x, pinchCenter.y);
+      }
+    }, { passive: false });
+
+    // Download
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `traffy-fondue-awards-2026-${selectedAward.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Share
+    shareBtn.addEventListener('click', async () => {
+      const shareText = buildShareText(selectedAward);
+
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const file = new File([blob], `traffy-fondue-awards-2026-${selectedAward.id}.png`, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'Traffy Fondue Awards 2026',
+            text: shareText,
+            files: [file]
+          });
+        } else if (navigator.share) {
+          await navigator.share({
+            title: 'Traffy Fondue Awards 2026',
+            text: shareText
+          });
+        } else {
+          await navigator.clipboard.writeText(shareText);
+          alert('อุปกรณ์นี้ยังไม่รองรับการแชร์ไฟล์โดยตรง\nคัดลอกข้อความสำหรับแชร์ให้แล้ว กรุณากดบันทึกรูปลงเครื่องแล้วแชร์ด้วยตนเอง');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    async function init() {
+      renderAwardButtons();
+      updateSelectedInfo();
+
+      try {
+        [traffyLogo, nstdaLogo] = await Promise.all([
+          loadImage('logo-traffy.webp'),
+          loadImage('logo-nstda.webp')
+        ]);
+      } catch (err) {
+        console.warn('โหลดโลโก้ไม่สำเร็จ', err);
+      }
+
+      drawCanvas();
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
